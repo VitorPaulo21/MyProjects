@@ -1,0 +1,3 @@
+enum ListTipe {
+  ALL, NORMAL, PRIO, FINISHED, WATCHING
+}
