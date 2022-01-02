@@ -171,6 +171,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                         return "Só pode haver no máximo 3 gêneros";
                       }
                     },
+                    direction: AxisDirection.up,
                     // hideOnEmpty: true,
                     hideOnError: true,
                     hideSuggestionsOnKeyboardHide: true,
@@ -196,6 +197,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                       if (genders.length + 1 < 4) {
                         setState(() {
                           genders.add(text!);
+                          genderController.text = "";
                         });
                       }
                       data.currentState?.validate();
