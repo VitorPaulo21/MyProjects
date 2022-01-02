@@ -1,6 +1,8 @@
 import 'package:anime_list/components/input_decoration_white.dart';
+import 'package:anime_list/data/genders.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chips_input/flutter_chips_input.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CreateAnimeScreen extends StatefulWidget {
   const CreateAnimeScreen({Key? key}) : super(key: key);
@@ -10,7 +12,18 @@ class CreateAnimeScreen extends StatefulWidget {
 }
 
 class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
-  List<Object?> genders = [];
+  bool isPrio = false;
+  GlobalKey<FormState> data = GlobalKey<FormState>();
+  Map<String, String> anime = {};
+  List<String> genders = [];
+  TextEditingController genderController = TextEditingController();
+  SuggestionsBoxController sugestionBoxController = SuggestionsBoxController();
+  void _submitForm() {
+    bool isValid = data.currentState?.validate() ?? false;
+    print(isValid);
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,149 +31,233 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         title: Text("Adicionar Anime"),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Form(
-          child: ListView(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: WillPopScope(
+        onWillPop: () {
+          if (sugestionBoxController.isOpened()) {
+            sugestionBoxController.close();
+            return Future<bool>.value(false);
+          }
+          return Future<bool>.value(true);
+        },
+        child: GestureDetector(
+          onTap: () {
+            if (sugestionBoxController.isOpened()) {
+              sugestionBoxController.close();
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Form(
+              key: data,
+              child: ListView(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Stack(alignment: Alignment.bottomRight, children: [
-                      Image.asset(
-                        "lib/assets/PikPng.com_luffy-png_1127171.png",
-                        height: 180,
-                        width: 115,
-                        fit: BoxFit.cover,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                Image.asset(
+                                  "lib/assets/PikPng.com_luffy-png_1127171.png",
+                                  height: 180,
+                                  width: 115,
+                                  fit: BoxFit.cover,
+                                ),
+                                Container(
+                                  width: 115,
+                                  height: 40,
+                                  color: Colors.black54,
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const Positioned(
+                                    top: 3,
+                                    right: 3,
+                                    child: CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor: Colors.red,
+                                      child: Icon(Icons.add,
+                                          color: Colors.white, size: 20),
+                                    )),
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      //TODO implement the add image button
+                                    },
+                                    child: const SizedBox(
+                                      height: 180,
+                                      width: 115,
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                        ),
                       ),
                       Container(
-                        width: 115,
-                        height: 40,
-                        color: Colors.black54,
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        width: MediaQuery.of(context).size.width - 145,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextFormField(
+                                cursorColor: Colors.white,
+                                textInputAction: TextInputAction.next,
+                                maxLength: 50,
+                                decoration: DecorationWithLabel("Titulo:"),
+                                validator: (text) {
+                                  if ((text ?? "").length < 3) {
+                                    return "Precisa de no minimo 3 letras";
+                                  }
+                                },
+                                onSaved: (title) {
+                                  anime["title"] = title!;
+                                },
+                              ),
+                              TextFormField(
+                                cursorColor: Colors.white,
+                                maxLines: 3,
+                                minLines: 3,
+                                maxLength: 200,
+                                decoration: DecorationWithLabel("Descriçâo:"),
+                                onSaved: (desc) {
+                                  anime["desc"] = desc ?? "";
+                                },
+                              )
+                            ]),
+                      )
+                    ],
+                  ),
+                  if (genders.isNotEmpty)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          const Text(
+                            "Generos: ",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          ...genders.map((e) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: InputChip(
+                                  label: Text(e),
+                                  avatar: CircleAvatar(
+                                    child: Text(
+                                        e.substring(0, e.length >= 2 ? 2 : 1)),
+                                  ),
+                                  onDeleted: () => setState(() {
+                                    genders.remove(e);
+                                    data.currentState?.validate();
+                                  }),
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ))
+                        ],
+                      ),
+                    ),
+                  TypeAheadFormField<String?>(
+                    validator: (text) {
+                      if (genders.length == 3) {
+                        return "Só pode haver no máximo 3 gêneros";
+                      }
+                    },
+                    // hideOnEmpty: true,
+                    hideOnError: true,
+                    hideSuggestionsOnKeyboardHide: true,
+                    suggestionsBoxController: sugestionBoxController,
+                    noItemsFoundBuilder: (ctx) => const ListTile(
+                      leading: Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                      ),
+                      title: Text(
+                        "Nenhum Gênero Encontrado",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    autoFlipDirection: true,
+                    textFieldConfiguration: TextFieldConfiguration(
+                        cursorColor: Colors.white,
+                        decoration: DecorationWithLabel("Generos"),
+                        controller: genderController,
+                        maxLength: 10,
+                        maxLines: 1),
+                    onSuggestionSelected: (text) {
+                      if (genders.length + 1 < 4) {
+                        setState(() {
+                          genders.add(text!);
+                        });
+                      }
+                      data.currentState?.validate();
+                    },
+                    itemBuilder: (ctx, sugestion) => ListTile(
+                      title: Text(sugestion!),
+                    ),
+                    suggestionsCallback: GenderSugestions.getSugestions,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(right: 8),
+                            child: Text(
+                              "Prioridade",
+                              style: TextStyle(fontSize: 17),
+                            ),
+                          ),
+                          CupertinoSwitch(
+                              value: isPrio,
+                              onChanged: (value) {
+                                setState(() {
+                                  isPrio = value;
+                                });
+                              }),
+                        ],
+                      ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(90),
+                        onTap: () {
+                          _submitForm();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Chip(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              label: const Text(
+                                "Adiconar",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              )),
                         ),
                       ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            //TODO implement the add image button
-                          },
-                          child: const SizedBox(
-                            height: 183,
-                            width: 115,
-                          ),
-                        ),
-                      )
-                    ]),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    width: MediaQuery.of(context).size.width - 135,
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextFormField(
-                            textInputAction: TextInputAction.next,
-                            maxLength: 50,
-                            decoration: DecorationWithLabel("Titulo:"),
-                            validator: (text) {
-                              if ((text ?? "").length < 3) {
-                                return "Precisa de no minimo 3 letras";
-                              }
-                            },
-                          ),
-                          TextFormField(
-                            maxLines: 3,
-                            minLines: 3,
-                            maxLength: 200,
-                            decoration: DecorationWithLabel("Descriçâo:"),
-                          )
-                        ]),
+                    ],
                   )
                 ],
               ),
-              FormField(
-                builder: (formFieldState) => ChipsInput(
-                  decoration: DecorationWithLabel("Genero"),
-                  maxChips: 3,
-                  allowChipEditing: false,
-                  inputAction: TextInputAction.done,
-                  findSuggestions: (String query) {
-                    if (query.length != 0) {
-                      //TODO quando a luista de sugestoes  no servidor estiver pronto adicione as sugestoes de genero aqui
-                      String text = query.toLowerCase();
-                      return <String>[
-                        text,
-                        "Ação",
-                        "Ecchi",
-                        "Comédia",
-                        "Romance",
-                        "Isekai",
-                        "Magia",
-                        "Maou",
-                      ]
-                          .where(
-                              (element) => element.toLowerCase().contains(text))
-                          .toList();
-                    } else {
-                      return const <String>[];
-                    }
-                  },
-                  onChanged: (data) {
-                    genders = data;
-                  },
-                  chipBuilder: (context, state, gender) {
-                    return InputChip(
-                      key: ObjectKey(gender),
-                      label: Text(gender.toString()),
-                      avatar: CircleAvatar(
-                        child: Text(gender.toString().substring(
-                            0, gender.toString().length >= 2 ? 2 : 1)),
-                      ),
-                      onDeleted: () => state.deleteChip(gender),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    );
-                  },
-                  suggestionBuilder: (context, state, gender) {
-                    return ListTile(
-                      key: ObjectKey(gender),
-                      leading: CircleAvatar(
-                        child: Text(gender.toString().substring(
-                            0, gender.toString().length >= 2 ? 2 : 1)),
-                      ),
-                      title: Text(gender.toString()),
-                      onTap: () => state.selectSuggestion(gender),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                alignment: Alignment.centerRight,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(90),
-                  onTap: () {},
-                  child: Chip(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      label: const Text(
-                        "Adiconar",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
-                      )),
-                ),
-              )
-            ],
+            ),
           ),
         ),
       ),

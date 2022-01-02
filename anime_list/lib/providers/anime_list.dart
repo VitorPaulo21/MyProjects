@@ -36,4 +36,8 @@ class AnimeList with ChangeNotifier {
   List<Anime> get prioAnimes {
     return _animeList.where((anime) => anime.isPrio && !anime.watched).toList();
   }
+
+  void addAnime(Map<String,String> anime){
+    
+  }
 }
