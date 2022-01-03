@@ -1,8 +1,13 @@
+import 'package:anime_list/components/image_pick_dialog.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
+import 'package:anime_list/data/dummy_data.dart';
 import 'package:anime_list/data/genders.dart';
+import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:provider/provider.dart';
 
 class CreateAnimeScreen extends StatefulWidget {
   const CreateAnimeScreen({Key? key}) : super(key: key);
@@ -12,252 +17,306 @@ class CreateAnimeScreen extends StatefulWidget {
 }
 
 class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
+  String ImgUrl = "";
   bool isPrio = false;
+  bool isValidImage = true;
   GlobalKey<FormState> data = GlobalKey<FormState>();
-  Map<String, String> anime = {};
+  Map<String, Object> anime = {};
   List<String> genders = [];
   TextEditingController genderController = TextEditingController();
   SuggestionsBoxController sugestionBoxController = SuggestionsBoxController();
   void _submitForm() {
     bool isValid = data.currentState?.validate() ?? false;
-    print(isValid);
+    if (isValid) {
+      data.currentState?.save();
+      if (genders.isNotEmpty) {
+        anime["genders"] = genders;
+      }
+      if (isPrio) {
+        anime["prio"] = true;
+      }
+      if (isValidImage) {
+        anime["imgUrl"] = ImgUrl;
+      }
+      Provider.of<AnimeList>(context,listen: false).addAnime(anime);
+      Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+    }
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Adicionar Anime"),
-        centerTitle: true,
-      ),
-      body: WillPopScope(
-        onWillPop: () {
-          if (sugestionBoxController.isOpened()) {
-            sugestionBoxController.close();
-            return Future<bool>.value(false);
-          }
-          return Future<bool>.value(true);
-        },
-        child: GestureDetector(
-          onTap: () {
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Adicionar Anime"),
+          centerTitle: true,
+          leading: IconButton(onPressed: () {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+          }, icon: const Icon(Icons.arrow_back)),
+        ),
+        body: WillPopScope(
+          onWillPop: () {
             if (sugestionBoxController.isOpened()) {
               sugestionBoxController.close();
+              return Future<bool>.value(false);
             }
+            return Future<bool>.value(true);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Form(
-              key: data,
-              child: ListView(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                Image.asset(
-                                  "lib/assets/PikPng.com_luffy-png_1127171.png",
-                                  height: 180,
-                                  width: 115,
-                                  fit: BoxFit.cover,
-                                ),
-                                Container(
-                                  width: 115,
-                                  height: 40,
-                                  color: Colors.black54,
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const Positioned(
-                                    top: 3,
-                                    right: 3,
-                                    child: CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: Colors.red,
-                                      child: Icon(Icons.add,
-                                          color: Colors.white, size: 20),
-                                    )),
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      //TODO implement the add image button
-                                    },
-                                    child: const SizedBox(
-                                      height: 180,
-                                      width: 115,
+          child: GestureDetector(
+            onTap: () {
+              if (sugestionBoxController.isOpened()) {
+                sugestionBoxController.close();
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Form(
+                key: data,
+                child: ListView(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  !ImgUrl.trim().isEmpty
+                                      ? Image.network(
+                                          ImgUrl,
+                                          height: 180,
+                                          width: 115,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (ctx, obj, _) {
+                                            isValidImage = false;
+    
+                                            return Container(
+                                              height: 180,
+                                              width: 115,
+                                              alignment: Alignment.center,
+                                              child: Text("Imagem Invalida"),
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          "lib/assets/PikPng.com_luffy-png_1127171.png",
+                                          height: 180,
+                                          width: 115,
+                                          fit: BoxFit.cover,
+                                        ),
+                                  Container(
+                                    width: 115,
+                                    height: 40,
+                                    color: Colors.black54,
+                                    child: const Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ),
-                              ]),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        width: MediaQuery.of(context).size.width - 145,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              TextFormField(
-                                cursorColor: Colors.white,
-                                textInputAction: TextInputAction.next,
-                                maxLength: 50,
-                                decoration: DecorationWithLabel("Titulo:"),
-                                validator: (text) {
-                                  if ((text ?? "").length < 3) {
-                                    return "Precisa de no minimo 3 letras";
-                                  }
-                                },
-                                onSaved: (title) {
-                                  anime["title"] = title!;
-                                },
-                              ),
-                              TextFormField(
-                                cursorColor: Colors.white,
-                                maxLines: 3,
-                                minLines: 3,
-                                maxLength: 200,
-                                decoration: DecorationWithLabel("Descriçâo:"),
-                                onSaved: (desc) {
-                                  anime["desc"] = desc ?? "";
-                                },
-                              )
-                            ]),
-                      )
-                    ],
-                  ),
-                  if (genders.isNotEmpty)
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          const Text(
-                            "Generos: ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          ...genders.map((e) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: InputChip(
-                                  label: Text(e),
-                                  avatar: CircleAvatar(
-                                    child: Text(
-                                        e.substring(0, e.length >= 2 ? 2 : 1)),
+                                  const Positioned(
+                                      top: 3,
+                                      right: 3,
+                                      child: CircleAvatar(
+                                        radius: 12,
+                                        backgroundColor: Colors.red,
+                                        child: Icon(Icons.add,
+                                            color: Colors.white, size: 20),
+                                      )),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        showDialog<String>(
+                                          context: context,
+                                          builder: (ctx) {
+                                            isValidImage = true;
+                                            return ImagePickDialog();
+                                          },
+                                        ).then((url) {
+                                          setState(() {
+                                            ImgUrl = url ?? "";
+                                          });
+                                        });
+                                      },
+                                      child: const SizedBox(
+                                        height: 180,
+                                        width: 115,
+                                      ),
+                                    ),
                                   ),
-                                  onDeleted: () => setState(() {
-                                    genders.remove(e);
-                                    data.currentState?.validate();
-                                  }),
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                  TypeAheadFormField<String?>(
-                    validator: (text) {
-                      if (genders.length == 3) {
-                        return "Só pode haver no máximo 3 gêneros";
-                      }
-                    },
-                    direction: AxisDirection.up,
-                    // hideOnEmpty: true,
-                    hideOnError: true,
-                    hideSuggestionsOnKeyboardHide: true,
-                    suggestionsBoxController: sugestionBoxController,
-                    noItemsFoundBuilder: (ctx) => const ListTile(
-                      leading: Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                      ),
-                      title: Text(
-                        "Nenhum Gênero Encontrado",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                    autoFlipDirection: true,
-                    textFieldConfiguration: TextFieldConfiguration(
-                        cursorColor: Colors.white,
-                        decoration: DecorationWithLabel("Generos"),
-                        controller: genderController,
-                        maxLength: 10,
-                        maxLines: 1),
-                    onSuggestionSelected: (text) {
-                      if (genders.length + 1 < 4) {
-                        setState(() {
-                          genders.add(text!);
-                          genderController.text = "";
-                        });
-                      }
-                      data.currentState?.validate();
-                    },
-                    itemBuilder: (ctx, sugestion) => ListTile(
-                      title: Text(sugestion!),
-                    ),
-                    suggestionsCallback: GenderSugestions.getSugestions,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(right: 8),
-                            child: Text(
-                              "Prioridade",
-                              style: TextStyle(fontSize: 17),
-                            ),
+                                ]),
                           ),
-                          CupertinoSwitch(
-                              value: isPrio,
-                              onChanged: (value) {
-                                setState(() {
-                                  isPrio = value;
-                                });
-                              }),
-                        ],
-                      ),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(90),
-                        onTap: () {
-                          _submitForm();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Chip(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              label: const Text(
-                                "Adiconar",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              )),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          width: MediaQuery.of(context).size.width - 145,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextFormField(
+                                  cursorColor: Colors.white,
+                                  textInputAction: TextInputAction.next,
+                                  maxLength: 50,
+                                  decoration: DecorationWithLabel("Titulo:"),
+                                  validator: (text) {
+                                    if ((text ?? "").length < 3) {
+                                      return "Precisa de no minimo 3 letras";
+                                    }
+                                  },
+                                  onSaved: (title) {
+                                    anime["title"] = title!;
+                                  },
+                                ),
+                                TextFormField(
+                                  cursorColor: Colors.white,
+                                  maxLines: 3,
+                                  minLines: 3,
+                                  maxLength: 200,
+                                  decoration: DecorationWithLabel("Descriçâo:"),
+                                  onSaved: (desc) {
+                                    if (desc.toString().trim().isNotEmpty) {
+                                    anime["desc"] = desc ?? "";
+                                      
+                                    }
+                                  },
+                                )
+                              ]),
+                        )
+                      ],
+                    ),
+                    if (genders.isNotEmpty)
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            const Text(
+                              "Generos: ",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                            ...genders.map((e) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: InputChip(
+                                    label: Text(e),
+                                    avatar: CircleAvatar(
+                                      child: Text(
+                                          e.substring(0, e.length >= 2 ? 2 : 1)),
+                                    ),
+                                    onDeleted: () => setState(() {
+                                      genders.remove(e);
+                                      data.currentState?.validate();
+                                    }),
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                ))
+                          ],
                         ),
                       ),
-                    ],
-                  )
-                ],
+                    TypeAheadFormField<String?>(
+                      validator: (text) {
+                      
+                        if (text.toString().trim().isNotEmpty && genders.length == 3) {
+                          return "Só pode haver no máximo 3 gêneros";
+                        }
+                      },
+                      direction: AxisDirection.up,
+                      // hideOnEmpty: true,
+                      hideOnError: true,
+                      hideSuggestionsOnKeyboardHide: true,
+                      suggestionsBoxController: sugestionBoxController,
+                      noItemsFoundBuilder: (ctx) => const ListTile(
+                        leading: Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                        ),
+                        title: Text(
+                          "Nenhum Gênero Encontrado",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      autoFlipDirection: true,
+                      textFieldConfiguration: TextFieldConfiguration(
+                          cursorColor: Colors.white,
+                          decoration: DecorationWithLabel("Generos"),
+                          controller: genderController,
+                          maxLength: 10,
+                          maxLines: 1),
+                      onSuggestionSelected: (text) {
+                        if (genders.length + 1 < 4) {
+                          setState(() {
+                            genders.add(text!);
+                            genderController.text = "";
+                          });
+                        }
+                        data.currentState?.validate();
+                      },
+                      itemBuilder: (ctx, sugestion) => ListTile(
+                        title: Text(sugestion!),
+                      ),
+                      suggestionsCallback: GenderSugestions.getSugestions,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8),
+                              child: Text(
+                                "Prioridade",
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ),
+                            CupertinoSwitch(
+                                value: isPrio,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isPrio = value;
+                                  });
+                                }),
+                          ],
+                        ),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(90),
+                          onTap: () {
+                            _submitForm();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Chip(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                label: const Text(
+                                  "Adiconar",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                )),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
