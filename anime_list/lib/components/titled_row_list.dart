@@ -2,6 +2,7 @@ import 'package:anime_list/components/continue_watching_list.dart';
 import 'package:anime_list/components/row_anime_list.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,10 @@ class TitledRowList extends StatelessWidget {
           padding: const EdgeInsets.only(top: 15, right: 10, left: 10,),
           child: InkWell(
             //TODO implementar o clique para ir para a lista completa
-            onTap: onTap,
+            onTap: () {
+              Navigator.pushReplacementNamed(context, AppRoutes.ANIME_LIST,
+                  arguments: listTipe);
+            },
             child: Row(
               children: [
                 Text(

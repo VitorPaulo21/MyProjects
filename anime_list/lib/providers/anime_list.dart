@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:anime_list/data/dummy_data.dart';
 import 'package:anime_list/models/anime.dart';
+import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/cupertino.dart';
 
 class AnimeList with ChangeNotifier {
@@ -22,7 +23,7 @@ class AnimeList with ChangeNotifier {
       title: anime["title"].toString(),
       genero: anime["genders"] as List<String>,
       description: anime.containsKey("desc") ? anime["desc"].toString() : "",
-      isPrio: anime.containsKey("isPrio") ? anime["isPrio"] as bool : false,
+      isPrio: anime.containsKey("prio") ? anime["prio"] as bool : false,
     );
     if (anime.containsKey("imgUrl")) {
       newAnime.setImageUrl(anime["imgUrl"].toString());
@@ -63,7 +64,36 @@ class AnimeList with ChangeNotifier {
     bool prio = true,
     bool normal = true,
     bool watched = true,
+      ListTipe? listTipe
   }) {
+    if (listTipe != null) {
+      if (listTipe == ListTipe.ALL) {
+        watching = true;
+        prio = true;
+        normal = true;
+        watched = true;
+      } else if (listTipe == ListTipe.WATCHING) {
+        watching = true;
+        prio = false;
+        normal = false;
+        watched = false;
+      } else if (listTipe == ListTipe.PRIO) {
+        watching = false;
+        prio = true;
+        normal = false;
+        watched = false;
+      } else if (listTipe == ListTipe.NORMAL) {
+        watching = false;
+        prio = false;
+        normal = true;
+        watched = false;
+      } else if (listTipe == ListTipe.FINISHED) {
+        watching = false;
+        prio = false;
+        normal = false;
+        watched = true;
+      }
+    }
     List<Anime> result = [];
 
     if (watching) {

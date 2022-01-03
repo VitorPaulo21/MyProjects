@@ -33,6 +33,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         anime["genders"] = genders;
       }
       if (isPrio) {
+        print(isPrio);
         anime["prio"] = true;
       }
       if (isValidImage) {

@@ -1,8 +1,11 @@
 import 'package:anime_list/components/random_indication.dart';
 import 'package:anime_list/components/titled_row_list.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/material.dart';
+
+import 'not_find_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -56,44 +59,7 @@ class HomeScreen extends StatelessWidget {
             onTap: () {},
           ),
         if (!(animeList.animeList.length > 0))
-          Container(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "lib/assets/luffy_like.png",
-                  height: 270,
-                  fit: BoxFit.fitHeight,
-                ),
-                const FittedBox(
-                  child: Text(
-                    "Parece que ainda nao temos nada cadastrado!",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                TextButton(
-                    style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        side: BorderSide(width: 2, color: Colors.white)),
-                    onPressed: () {
-                      //TODO implementar cadastro de anime
-                    },
-                    child: const Text(
-                      "Que tal cadastrar algo?",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ))
-              ],
-            ),
-          ),
+          NotFindScreen(),
         const SizedBox(
           height: 80,
         ),
@@ -101,3 +67,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
