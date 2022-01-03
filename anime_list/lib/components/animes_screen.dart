@@ -10,9 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AnimesScreen extends StatefulWidget {
- 
-  const AnimesScreen({Key? key})
-      : super(key: key);
+  const AnimesScreen({Key? key}) : super(key: key);
 
   @override
   _AnimesScreenState createState() => _AnimesScreenState();
@@ -22,120 +20,186 @@ class _AnimesScreenState extends State<AnimesScreen> {
   List<Anime> animes = [];
   ListTipe listTipe = ListTipe.ALL;
   late AnimeList animeList;
+  String queryData = "";
+  TextEditingController searchController = TextEditingController();
 
-    @override
+  @override
   void didChangeDependencies() {
-    Object? listparam = ModalRoute.of(context)?.settings.arguments;
-    listTipe = listparam.runtimeType == Null ? ListTipe.ALL : listparam as ListTipe;
+    Object? params = ModalRoute.of(context)?.settings.arguments;
+    bool isParamNull = params.runtimeType == Null;
+    ListTipe? listParam = isParamNull
+        ? null
+        : (params as Map<String, Object>).containsKey("listTipe")
+            ? ((params as Map<String, Object>)["listTipe"]) as ListTipe
+            : null;
+    String? queryParam = isParamNull
+        ? null
+        : (params as Map<String, Object>).containsKey("query")
+            ? ((params as Map<String, Object>)["query"]) as String
+            : null;
+    queryData = queryParam ?? "";
+    listTipe = listParam ?? ListTipe.ALL;
     animeList = Provider.of<AnimeList>(context);
-    animes = animeList.getListWithFilters(listTipe: listTipe);
-    
+    animes = queryData.trim().isEmpty
+        ? animeList.getListWithFilters(listTipe: listTipe)
+        : animeList
+            .getListWithFilters(listTipe: listTipe)
+            .where(
+                (e) => e.title.toLowerCase().contains(queryData.toLowerCase()))
+            .toList();
+        searchController =
+        TextEditingController(text: queryData);
     super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
-
+    
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         Navigator.of(context).pushNamed(AppRoutes.HOME);
         return Future<bool>.value(true);
       },
       child: Scaffold(
-        appBar: AppBar(
-            title: const Text("Anime List"),
-            centerTitle: true,
-            backgroundColor: Colors.black,
-            actions: [
-              PopupMenuButton<ListTipe>(
-                onSelected: (tipe) {
-                  setState(() {
-                    listTipe = tipe;
-                    animes = animeList.getListWithFilters(listTipe: listTipe);
-                  });
-                },
-                icon: const Icon(Icons.sort, textDirection: TextDirection.rtl,),
-                itemBuilder: (ctx) => const [
-                  PopupMenuItem<ListTipe>(
-                    value: ListTipe.ALL,
-                    child: Text("Todos"),
+          appBar: AppBar(
+              title: const Text("Anime List"),
+              centerTitle: true,
+              backgroundColor: Colors.black,
+              actions: [
+                PopupMenuButton<ListTipe>(
+                  onSelected: (tipe) {
+                    setState(() {
+                      listTipe = tipe;
+                      animes = animeList.getListWithFilters(listTipe: listTipe);
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.sort,
+                    textDirection: TextDirection.rtl,
                   ),
-                  PopupMenuItem<ListTipe>(
-                    value: ListTipe.WATCHING,
-                    child: Text("Assistindo"),
-                  ),
-                  PopupMenuItem<ListTipe>(
-                    value: ListTipe.PRIO,
-                    child: Text("Prioridade"),
-                  ),
-                  PopupMenuItem<ListTipe>(
-                    value: ListTipe.NORMAL,
-                    child: Text("Normal"),
-                  ),
-                  PopupMenuItem<ListTipe>(
-                    value: ListTipe.FINISHED,
-                    child: Text("Assistidos"),
-                  ),
-                ],
-              )
-            ]),
-        body: LayoutBuilder(builder: (ctx, constraints) => 
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(right: 8, left: 8, bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  const Icon(Icons.search),
+                  itemBuilder: (ctx) => [
+                    PopupMenuItem<ListTipe>(
+                      value: ListTipe.ALL,
+                      child: Text(
+                        "Todos",
+                        style: TextStyle(
+                            color: listTipe == ListTipe.ALL
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.white),
+                      ),
+                    ),
+                    PopupMenuItem<ListTipe>(
+                      value: ListTipe.WATCHING,
+                      child: Text(
+                        "Assistindo",
+                        style: TextStyle(
+                            color: listTipe == ListTipe.WATCHING
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.white),
+                      ),
+                    ),
+                    PopupMenuItem<ListTipe>(
+                      value: ListTipe.PRIO,
+                      child: Text(
+                        "Prioridade",
+                        style: TextStyle(
+                            color: listTipe == ListTipe.PRIO
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.white),
+                      ),
+                    ),
+                    PopupMenuItem<ListTipe>(
+                      value: ListTipe.NORMAL,
+                      child: Text(
+                        "Normal",
+                        style: TextStyle(
+                            color: listTipe == ListTipe.NORMAL
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.white),
+                      ),
+                    ),
+                    PopupMenuItem<ListTipe>(
+                      value: ListTipe.FINISHED,
+                      child: Text(
+                        "Assistidos",
+                        style: TextStyle(
+                            color: listTipe == ListTipe.FINISHED
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.white),
+                      ),
+                    ),
+                  ],
+                )
+              ]),
+          body: LayoutBuilder(
+            builder: (ctx, constraints) => SingleChildScrollView(
+              child: Column(
+                children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 8),
-                    width: constraints.maxWidth * 0.9,
-                    child: TextField(
-                      textInputAction: TextInputAction.search,
-                      decoration: DecorationWithLabel("Pesquisar Anime"),
-                      
-                      onChanged: (query){
-                        if (query.isEmpty) {
-                          setState(() {
-                            animes = animeList.getListWithFilters(
+                    padding: EdgeInsets.only(right: 8, left: 8, bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.search),
+                        Container(
+                            padding: const EdgeInsets.only(left: 8),
+                            width: constraints.maxWidth * 0.9,
+                            child: TextField(
+                              controller: searchController,
+                              textInputAction: TextInputAction.search,
+                              decoration: DecorationWithLabel("Pesquisar Anime")
+                                  .copyWith(),
+                              onChanged: (query) {
+                                if (query.isEmpty) {
+                                  setState(() {
+                                    animes = animeList.getListWithFilters(
                                         listTipe: listTipe);
-                          });
-                        } else {
-                          setState(() {
-                            animes = animeList.getListWithFilters(
+                                  });
+                                } else {
+                                  setState(() {
+                                    animes = animeList.getListWithFilters(
                                         listTipe: listTipe);
-                            animes = animes.where((anime) => anime.title.toLowerCase().contains(query.toLowerCase())).toList();
-                            print(animes.length);
-                          });
-                        }
-                      },
-                    ))
-                ],),
+                                    animes = animes
+                                        .where((anime) => anime.title
+                                            .toLowerCase()
+                                            .contains(query.toLowerCase()))
+                                        .toList();
+                                   
+                                  });
+                                }
+                              },
+                            ))
+                      ],
+                    ),
+                  ),
+                  animes.length > 0
+                      ? Container(
+                          height: constraints.maxHeight * 0.87,
+                          child: GridView.builder(
+                              padding: const EdgeInsets.all(10),
+                              itemCount: animes.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      childAspectRatio: 9 / 12,
+                                      crossAxisSpacing: 15,
+                                      mainAxisSpacing: 15,
+                                      crossAxisCount: 3),
+                              itemBuilder: (ctx, index) {
+                                // return RowAnimeListItem(animes[index]);
+                                return AnimeListGridItem(animes[index]);
+                              }),
+                        )
+                      : NotFindScreen(
+                          message: animeList.animeList.length <= 0
+                              ? null
+                              : "Nenhum anime encontrado",
+                        )
+                ],
               ),
-              animes.length > 0 ? Container(
-                height: constraints.maxHeight * 0.87,
-                child: GridView.builder(
-                    padding: const EdgeInsets.all(10),
-                    itemCount: animes.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 9 / 12,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                        crossAxisCount: 3),
-                    itemBuilder: (ctx, index) {
-        
-                      // return RowAnimeListItem(animes[index]);
-                      return AnimeListGridItem(animes[index]);
-                    }),
-              ) :
-              NotFindScreen(message: animeList.animeList.length <= 0 ? null : "Nenhum anime encontrado",)
-            ],
-          ),
-        ),)
-      ),
+            ),
+          )),
     );
   }
 }

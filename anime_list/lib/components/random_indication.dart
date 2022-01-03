@@ -25,7 +25,6 @@ class _RandomIndicationState extends State<RandomIndication> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // TODO: implement didChangeDependencies
     animeList = Provider.of<AnimeList>(context, listen: false)
         .animeList
         .where((anime) => !anime.watched)

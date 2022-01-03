@@ -2,6 +2,7 @@ import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/components/home_screen.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenScrool extends StatelessWidget {
@@ -54,7 +55,9 @@ class HomeScreenScrool extends StatelessWidget {
                           width: 250,
                           child: TextField(
                             onSubmitted: (text) {
-                              //TODO implement the search to go to the animes page
+                              Navigator.of(context).pushReplacementNamed(
+                                  AppRoutes.ANIME_LIST,
+                                  arguments: {"query": text});
                             },
                             textInputAction: TextInputAction.search,
                             cursorColor: Colors.white,
