@@ -47,14 +47,12 @@ class _AnimesScreenState extends State<AnimesScreen> {
             .where(
                 (e) => e.title.toLowerCase().contains(queryData.toLowerCase()))
             .toList();
-        searchController =
-        TextEditingController(text: queryData);
+    searchController = TextEditingController(text: queryData);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return WillPopScope(
       onWillPop: () {
         Navigator.of(context).pushNamed(AppRoutes.HOME);
@@ -64,7 +62,7 @@ class _AnimesScreenState extends State<AnimesScreen> {
           appBar: AppBar(
               title: const Text("Anime List"),
               centerTitle: true,
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.black54,
               actions: [
                 PopupMenuButton<ListTipe>(
                   onSelected: (tipe) {
@@ -166,7 +164,6 @@ class _AnimesScreenState extends State<AnimesScreen> {
                                             .toLowerCase()
                                             .contains(query.toLowerCase()))
                                         .toList();
-                                   
                                   });
                                 }
                               },

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -21,6 +22,7 @@ class _RandomIndicationState extends State<RandomIndication> {
   List<Anime> randomAnimes = [];
   late Anime actualAnime;
   int actualIndex = 0;
+
 
   @override
   void didChangeDependencies() {
@@ -140,52 +142,66 @@ class _RandomIndicationState extends State<RandomIndication> {
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Colors.white,
-                                    ),
-                                    onPressed: () {},
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: const [
-                                        Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.black,
-                                        ),
-                                        SizedBox(
-                                          width: 6,
-                                        ),
-                                        Text(
-                                          "Assistir",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        )
-                                      ],
+                                Consumer<AnimeList>(
+                                  builder: (ctx, animeListProvider, _) => Container(
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        animeListProvider.changeWacth(actualAnime);
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          
+                                          Icon(
+                                            actualAnime.watching
+                                                ? Icons.check
+                                                : Icons.play_arrow,
+                                            color: Colors.black,
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          Text(
+                                            actualAnime.watching
+                                                ? "Finalizar"
+                                                : "Assistir",
+                                            style: TextStyle(color: Colors.black),
+                                          ),
+                                         
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const [
-                                        Icon(
-                                          Icons.info_outline,
-                                          size: 30,
-                                          color: Colors.white,
-                                        ),
-                                        Text(
-                                          "Saiba Mais",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10),
-                                        )
-                                      ],
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: (ctx) =>
+                                                InfoBotomSheet(actualAnime));
+                                      },
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: const [
+                                          Icon(
+                                            Icons.info_outline,
+                                            size: 30,
+                                            color: Colors.white,
+                                          ),
+                                          Text(
+                                            "Saiba Mais",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

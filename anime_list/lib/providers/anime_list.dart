@@ -58,6 +58,22 @@ class AnimeList with ChangeNotifier {
   List<Anime> get prioAnimes {
     return _animeList.where((anime) => anime.isPrio && !anime.watched).toList();
   }
+  void changeWacth(Anime anime) {
+    Anime updatedAnime = findFirst(anime);
+    updatedAnime.watching = !updatedAnime.watching;
+    notifyListeners();
+  }
+
+  void changePrio(Anime anime) {
+    Anime updatedAnime = findFirst(anime);
+    updatedAnime.isPrio = !updatedAnime.isPrio;
+    notifyListeners();
+  }
+
+  Anime findFirst(Anime anime) {
+    return animeList.firstWhere((element) => element.id == anime.id);
+  }
+
 
   List<Anime> getListWithFilters({
     bool watching = true,
@@ -120,7 +136,6 @@ class AnimeList with ChangeNotifier {
     if (watched) {
       result.addAll(concluidolAnimes);
     }
-
     return result;
   }
 }

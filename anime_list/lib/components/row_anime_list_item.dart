@@ -2,6 +2,8 @@ import 'package:anime_list/models/anime.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import 'info_bottom_sheet.dart';
+
 class RowAnimeListItem extends StatelessWidget {
   final Anime anime;
   const RowAnimeListItem(this.anime, {Key? key}) : super(key: key);
@@ -22,7 +24,8 @@ class RowAnimeListItem extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                //TODO implementar o clique para ir nos detalhes do anime
+                showModalBottomSheet(
+                    context: context, builder: (ctx) => InfoBotomSheet(anime));
               },
               child: const SizedBox(
                 height: 180,

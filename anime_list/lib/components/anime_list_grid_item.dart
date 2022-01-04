@@ -1,3 +1,4 @@
+import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,13 @@ class AnimeListGridItem extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  //TODO implementar o clique para ir nos detalhes do anime
+                  showModalBottomSheet(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10))),
+                      context: context,
+                      builder: (ctx) => InfoBotomSheet(anime));
                 },
                 child: SizedBox(
                   height: constraints.maxHeight,

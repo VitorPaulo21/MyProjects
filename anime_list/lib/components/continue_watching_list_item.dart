@@ -1,3 +1,4 @@
+import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:flutter/material.dart';
 
@@ -66,7 +67,9 @@ class ContinueWatchingListItem extends StatelessWidget {
               children: [
                 IconButton(
                     onPressed: () {
-                      //TODO implement info button
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (ctx) => InfoBotomSheet(anime));
                     },
                     icon: const Icon(Icons.info_outline)),
                 const Spacer(),
