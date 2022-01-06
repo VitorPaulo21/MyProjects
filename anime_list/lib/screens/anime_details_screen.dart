@@ -72,16 +72,21 @@ class AnimeDetailsScreen extends StatelessWidget {
               ),
             ),
             if (anime.watched)
-              const SizedBox(
-                height: 5,
+              Column(
+                children: const [
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Assistido",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-            const Text(
-              "Assistido",
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            
             if (anime.isPrio)
               Column(
                 children: [
@@ -178,6 +183,9 @@ class AnimeDetailsScreen extends StatelessWidget {
             LabeledChangebleButton(actualAnime: anime)
           ],
           //TODO implementar botao share
+          //TODO implementar botao deletar
+          //TODO implementar enviar anime para editar na tela de criação
+          //TODO implementar copiar o titulo para a clipboard tanto aqui quanto no botom sheet
           //TODO implementar share na opçoes do anime tmbm
           //TODO dar um jeito de manter o botao sempre em baixo e verificar se textos grandes aplicam rolagem
         ),
