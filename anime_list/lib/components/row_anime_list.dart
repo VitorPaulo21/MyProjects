@@ -8,6 +8,8 @@ class rowAnimeList extends StatelessWidget {
   final List<Anime> animeList;
   const rowAnimeList(this.animeList, { Key? key }) : super(key: key);
 
+
+
   @override
   Widget build(BuildContext context) {
     animeList.shuffle();

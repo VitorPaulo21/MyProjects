@@ -1,5 +1,6 @@
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.HOME: (_) => AnimeListScreen(),
           AppRoutes.CREATE_ANIME: (_) => CreateAnimeScreen(),
           AppRoutes.ANIME_LIST: (_) => AnimesScreen(),
+          AppRoutes.ANIME_DETAILS: (_) => AnimeDetailsScreen(),
         },
       ),
     );

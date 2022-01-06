@@ -68,7 +68,7 @@ class HomeScreenScrool extends StatelessWidget {
                     ])
           ],
         ),
-        SliverToBoxAdapter(child: HomeScreen(animeList: animeList)),
+        SliverToBoxAdapter(child: HomeScreen()),
       ],
     );
   }

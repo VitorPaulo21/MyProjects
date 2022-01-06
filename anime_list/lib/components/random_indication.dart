@@ -23,7 +23,6 @@ class _RandomIndicationState extends State<RandomIndication> {
   late Anime actualAnime;
   int actualIndex = 0;
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -143,18 +142,20 @@ class _RandomIndicationState extends State<RandomIndication> {
                                   ),
                                 ),
                                 Consumer<AnimeList>(
-                                  builder: (ctx, animeListProvider, _) => Container(
+                                  builder: (ctx, animeListProvider, _) =>
+                                      Container(
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         primary: Colors.white,
                                       ),
                                       onPressed: () {
-                                        animeListProvider.changeWacth(actualAnime);
+                                        animeListProvider
+                                            .changeWacth(actualAnime);
                                       },
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
                                         children: [
-                                          
                                           Icon(
                                             actualAnime.watching
                                                 ? Icons.check
@@ -165,12 +166,15 @@ class _RandomIndicationState extends State<RandomIndication> {
                                             width: 3,
                                           ),
                                           Text(
+                                            //TODO implementar o cntinuar assistindo se
+                                            // ja estiver assistido, e remover o a anime
+                                            // da lista de randoms se ele ja estiver assistido
                                             actualAnime.watching
                                                 ? "Finalizar"
                                                 : "Assistir",
-                                            style: TextStyle(color: Colors.black),
+                                            style:
+                                                TextStyle(color: Colors.black),
                                           ),
-                                         
                                         ],
                                       ),
                                     ),

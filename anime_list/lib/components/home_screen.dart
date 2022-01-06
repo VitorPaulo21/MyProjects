@@ -4,19 +4,20 @@ import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'not_find_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     Key? key,
-    required this.animeList,
   }) : super(key: key);
 
-  final AnimeList animeList;
+  
 
   @override
   Widget build(BuildContext context) {
+    AnimeList animeList = Provider.of<AnimeList>(context);
     return Column(
       children: [
         const RandomIndication(),

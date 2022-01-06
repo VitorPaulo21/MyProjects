@@ -2,6 +2,7 @@ import 'package:anime_list/components/anime_list_grid_item.dart';
 import 'package:anime_list/components/row_anime_list_item.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -126,7 +127,9 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
           ),
           InkWell(
             onTap: () {
-              //TODO implementar click para informação completa do anime
+              Navigator.of(context).pushReplacementNamed(
+                  AppRoutes.ANIME_DETAILS,
+                  arguments: anime);
             },
             child: Row(
               children: const [
