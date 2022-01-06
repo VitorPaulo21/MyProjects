@@ -177,6 +177,8 @@ class AnimeDetailsScreen extends StatelessWidget {
                 child: Text(anime.description)),
             LabeledChangebleButton(actualAnime: anime)
           ],
+          //TODO implementar botao share
+          //TODO implementar share na opçoes do anime tmbm
           //TODO dar um jeito de manter o botao sempre em baixo e verificar se textos grandes aplicam rolagem
         ),
       ),
