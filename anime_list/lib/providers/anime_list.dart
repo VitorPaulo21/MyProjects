@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:anime_list/data/dummy_data.dart';
 import 'package:anime_list/models/anime.dart';
+import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -15,6 +16,10 @@ class AnimeList with ChangeNotifier {
   }
 
   void addAnime(Map<String, Object> anime) {
+    if (anime.containsKey("id")) {
+      updateAnime(anime);
+      return;
+    }
     print(anime["title"].toString());
     Anime newAnime = Anime(
       id: anime.containsKey("id")
@@ -29,6 +34,34 @@ class AnimeList with ChangeNotifier {
       newAnime.setImageUrl(anime["imgUrl"].toString());
     }
     _animeList.add(newAnime);
+    notifyListeners();
+  }
+
+  void updateAnime(Map<String, Object> anime) {
+    if (findAnimeById(anime["id"].toString()) != null) {
+      Anime animeUpdate = findAnimeById(anime["id"].toString())!;
+
+      animeUpdate.title = anime["title"].toString();
+      animeUpdate.genero = anime["genders"] as List<String>;
+      if (anime.containsKey("imgUrl")) {
+        animeUpdate.imageUrl = anime["imgUrl"].toString();
+      }
+      if (anime.containsKey("desc")) {
+        animeUpdate.description = anime["desc"].toString();
+      }
+      if (anime.containsKey("prio")) {
+        animeUpdate.isPrio = anime["prio"] as bool;
+      }
+      if (anime.containsKey("watched")) {
+        animeUpdate.watched = anime["watched"] as bool;
+      }
+      if (anime.containsKey("watching")) {
+        animeUpdate.watching = anime["watching"] as bool;
+      }
+      animeList.insert(
+          animeList.indexOf(findAnimeById(anime["id"].toString())!),
+          animeUpdate);
+    }
     notifyListeners();
   }
 
@@ -71,10 +104,18 @@ class AnimeList with ChangeNotifier {
   }
 
   Anime findFirst(Anime anime) {
-    return animeList.firstWhere((element) => element.id == anime.id);
+    return _animeList.firstWhere((element) => element.id == anime.id);
   }
 
+  Anime? findAnimeById(String id) {
+    return _animeList.firstWhere((element) => element.id == id, orElse: null);
+  }
 
+  void deleteAnime(Anime anime, BuildContext context) {
+    _animeList.removeWhere((element) => element == anime);
+    
+    notifyListeners();
+  }
   List<Anime> getListWithFilters({
     bool watching = true,
     bool prio = true,

@@ -2,6 +2,7 @@ import 'package:anime_list/components/image_pick_dialog.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/data/dummy_data.dart';
 import 'package:anime_list/data/genders.dart';
+import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,10 +21,13 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
   String ImgUrl = "";
   bool isPrio = false;
   bool isValidImage = true;
+  bool edited = false;
   GlobalKey<FormState> data = GlobalKey<FormState>();
   Map<String, Object> anime = {};
   List<String> genders = [];
   TextEditingController genderController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
   SuggestionsBoxController sugestionBoxController = SuggestionsBoxController();
   void _submitForm() {
     bool isValid = data.currentState?.validate() ?? false;
@@ -40,15 +44,60 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         anime["imgUrl"] = ImgUrl;
       }
       Provider.of<AnimeList>(context,listen: false).addAnime(anime);
-      Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+      }
     }
   }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Object? obj = ModalRoute.of(context)?.settings.arguments;
+    if (obj.runtimeType != Null && !edited) {
+    setState(() {
+      edited = true;
+      Anime animeOld = obj as Anime;
+        anime["id"] = animeOld.id;
+        anime["title"] = animeOld.title;
+        anime["desc"] = animeOld.description;
+        anime["imgUrl"] = animeOld.imageUrl;
+        anime["genders"] = animeOld.genero;
+        anime["prio"] = animeOld.isPrio;
+        anime["watched"] = animeOld.watched;
+        anime["watching"] = animeOld.watching;
 
+        if (anime.isNotEmpty) {
+          if (anime.containsKey("title")) {
+            titleController.text = anime["title"].toString();
+          }
+          if (anime.containsKey("desc")) {
+            descriptionController.text = anime["desc"].toString();
+          }
+          if (anime.containsKey("imgUrl")) {
+            ImgUrl = anime["imgUrl"].toString();
+          }
+          if (anime.containsKey("genders")) {
+            genders = anime["genders"] as List<String>;
+          }
+          if (anime.containsKey("prio")) {
+            isPrio = anime["prio"] as bool;
+          }
+        }
+    });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        }
+        
         return Future.value(true);
       },
       child: Scaffold(
@@ -56,7 +105,12 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
           title: Text("Adicionar Anime"),
           centerTitle: true,
           leading: IconButton(onPressed: () {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+                }
+                ;
           }, icon: const Icon(Icons.arrow_back)),
         ),
         body: WillPopScope(
@@ -163,6 +217,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 TextFormField(
+                                  initialValue: anime.containsKey("title") ? anime["title"].toString() : "",
                                   cursorColor: Colors.white,
                                   textInputAction: TextInputAction.next,
                                   maxLength: 50,
@@ -178,10 +233,14 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                 ),
                                 TextFormField(
                                   cursorColor: Colors.white,
+                                  initialValue: anime.containsKey("desc")
+                                      ? anime["desc"].toString()
+                                      : "",
                                   maxLines: 3,
                                   minLines: 3,
                                   maxLength: 200,
                                   decoration: DecorationWithLabel("Descriçâo:"),
+                                  
                                   onSaved: (desc) {
                                     if (desc.toString().trim().isNotEmpty) {
                                     anime["desc"] = desc ?? "";
@@ -289,6 +348,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     isPrio = value;
+                                    anime["prio"] = value;
                                   });
                                 }),
                           ],
@@ -305,9 +365,9 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                     Theme.of(context).colorScheme.secondary,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
-                                label: const Text(
-                                  "Adiconar",
-                                  style: TextStyle(
+                                label:  Text(
+                                  Navigator.of(context).canPop() ? "Salvar" : "Adicionar",
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16),

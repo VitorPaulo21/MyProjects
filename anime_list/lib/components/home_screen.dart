@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
     AnimeList animeList = Provider.of<AnimeList>(context);
     return Column(
       children: [
-        const RandomIndication(),
+        RandomIndication(),
         const SizedBox(
           height: 5,
         ),

@@ -1,12 +1,16 @@
+
+
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/components/home_screen.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreenScrool extends StatelessWidget {
-  const HomeScreenScrool({
+class HomeScreenScrool extends StatefulWidget {
+  HomeScreenScrool({
     Key? key,
     required int currentIndex,
     required this.animeList,
@@ -17,7 +21,19 @@ class HomeScreenScrool extends StatelessWidget {
   final AnimeList animeList;
 
   @override
+  State<HomeScreenScrool> createState() => _HomeScreenScroolState();
+}
+
+class _HomeScreenScroolState extends State<HomeScreenScrool> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  
   Widget build(BuildContext context) {
+    DeleteObserver deleteObserver = Provider.of<DeleteObserver>(context);
     return CustomScrollView(
       slivers: [
         SliverAppBar(

@@ -73,11 +73,72 @@ class ContinueWatchingListItem extends StatelessWidget {
                     },
                     icon: const Icon(Icons.info_outline)),
                 const Spacer(),
-                IconButton(
-                    onPressed: () {
-                      //TODO implement more options button
-                    },
-                    icon: const Icon(Icons.more_vert))
+                PopupMenuButton(
+                  //TODO implement delete button
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (ctx) => [
+                    PopupMenuItem(
+                        //TODO implement finalizar button
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.check,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Finalizar",
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    )),
+                    PopupMenuItem(
+                      //TODO implement share button
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(
+                            Icons.share_outlined,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "Compartilhar",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          "Deletar",
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    )),
+                  ],
+                )
               ],
             ),
           )

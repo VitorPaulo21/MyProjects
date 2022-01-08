@@ -15,181 +15,231 @@ class AnimeDetailsScreen extends StatelessWidget {
     AnimeList animeList = Provider.of<AnimeList>(context);
     Anime anime = ModalRoute.of(context)?.settings.arguments as Anime;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Detalhes do Anime"),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<ListTile>(
-              icon: Icon(Icons.search),
-              itemBuilder: (ctx) => <PopupMenuEntry<ListTile>>[
-                    PopupMenuItem<ListTile>(
-                        child: ListTile(
-                      enabled: true,
-                      leading: Container(
-                        height: 70,
-                        child: const Icon(
-                          Icons.search,
-                          color: Colors.white,
+        appBar: AppBar(
+          title: Text("Detalhes do Anime"),
+          centerTitle: true,
+          actions: [
+            PopupMenuButton<ListTile>(
+                icon: Icon(Icons.search),
+                itemBuilder: (ctx) => <PopupMenuEntry<ListTile>>[
+                      PopupMenuItem<ListTile>(
+                          child: ListTile(
+                        enabled: true,
+                        leading: Container(
+                          height: 70,
+                          child: const Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      title: Container(
-                        height: 70,
-                        width: 250,
-                        child: TextField(
-                          onSubmitted: (text) {
-                            Navigator.of(context).pushReplacementNamed(
-                                AppRoutes.ANIME_LIST,
-                                arguments: {"query": text});
-                          },
-                          textInputAction: TextInputAction.search,
-                          cursorColor: Colors.white,
-                          decoration: DecorationWithLabel("Pesquisar Anime"),
+                        title: Container(
+                          height: 70,
+                          width: 250,
+                          child: TextField(
+                            onSubmitted: (text) {
+                              Navigator.of(context).pushReplacementNamed(
+                                  AppRoutes.ANIME_LIST,
+                                  arguments: {"query": text});
+                            },
+                            textInputAction: TextInputAction.search,
+                            cursorColor: Colors.white,
+                            decoration: DecorationWithLabel("Pesquisar Anime"),
+                          ),
                         ),
-                      ),
-                    ))
-                  ])
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CachedNetworkImage(
-              imageUrl: anime.imageUrl,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              anime.title,
-              style: const TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
+                      ))
+                    ])
+          ],
+        ),
+        bottomSheet:  Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            children: [
+              LabeledChangebleButton(actualAnime: anime),
+              const SizedBox(
+                width: 10,
               ),
-            ),
-            if (anime.watched)
-              Column(
-                children: const [
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Assistido",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              LabeledChangebleButton(
+                //Implementar Share button
+                actualAnime: anime,
+                icon: Icons.share_outlined,
+                label: "Compartilhar",
+                size: 30,
+                function: labeledButtonFunctions.share,
               ),
-            
-            if (anime.isPrio)
-              Column(
-                children: [
-                  const SizedBox(
-                    height: 10,
+              Spacer(),
+              LabeledChangebleButton(
+                label: "Remover",
+                actualAnime: anime,
+                color: Colors.red,
+                icon: Icons.delete_outline,
+                function: labeledButtonFunctions.delete,
+              )
+            ],
+          ),
+        ),
+        body: LayoutBuilder(
+          builder: (ctx, constraints) => SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CachedNetworkImage(
+                  imageUrl: anime.imageUrl,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  anime.title,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        alignment: Alignment.center,
-                        padding: EdgeInsetsDirectional.all(2),
-                        height: 30,
-                        decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(5)),
-                        child: const Text(
-                          "Prio",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                ),
+                if (anime.watched)
+                  Column(
+                    children: const [
+                      SizedBox(
+                        height: 5,
                       ),
-                      const Text(
-                        "Prioridade",
+                      Text(
+                        "Assistido",
                         style: TextStyle(
-                          fontSize: 16,
+                          color: Colors.green,
                           fontWeight: FontWeight.bold,
                         ),
-                      )
+                      ),
                     ],
                   ),
-                ],
-              ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                  onPressed: () {
-                    animeList.changeWacth(anime);
-                  },
-                  style: ElevatedButton.styleFrom(primary: Colors.white),
-                  child: Row(
+                if (anime.isPrio)
+                  Column(
                     children: [
-                      const Spacer(),
-                      Icon(
-                        anime.watching ? Icons.check : Icons.play_arrow,
-                        color: Colors.black,
-                      ),
                       const SizedBox(
-                        width: 8,
+                        height: 10,
                       ),
-                      Text(
-                        anime.watching ? "Finalizar" : "Assistir",
-                        style: const TextStyle(color: Colors.black),
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            alignment: Alignment.center,
+                            padding: EdgeInsetsDirectional.all(2),
+                            height: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(5)),
+                            child: const Text(
+                              "Prio",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const Text(
+                            "Prioridade",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
                       ),
-                      const Spacer()
                     ],
-                  )),
+                  ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        animeList.changeWacth(anime);
+                      },
+                      style: ElevatedButton.styleFrom(primary: Colors.white),
+                      child: Row(
+                        children: [
+                          const Spacer(),
+                          Icon(
+                            anime.watching ? Icons.check : Icons.play_arrow,
+                            color: Colors.black,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            anime.watching ? "Finalizar" : "Assistir",
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          const Spacer()
+                        ],
+                      )),
+                ),
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRoutes.CREATE_ANIME,
+                            arguments: anime);
+                      },
+                      style:
+                          ElevatedButton.styleFrom(primary: Colors.grey[800]),
+                      child: Row(
+                        children: const [
+                          Spacer(),
+                          Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            "Editar",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Spacer()
+                        ],
+                      )),
+                ),
+                const SizedBox(
+                  height: 2,
+                ),
+                Text(
+                  " ${anime.genero.fold("Genero: ", (previousValue, element) {
+                    return previousValue.toString() + "," + element ;
+                  }).toString().replaceFirst(",", "")}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: anime.isPrio && anime.watched
+                      ? constraints.maxHeight * 0.17
+                      : anime.watched
+                          ? constraints.maxHeight * 0.235
+                          : anime.isPrio
+                              ? constraints.maxHeight * 0.20
+                              : constraints.maxHeight * 0.27,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                      child: Text("Desc: ${anime.description}")),
+                ),
+                
+              ],
+              //TODO implementar usar foto padrao quando nao houver
+              //TODO implementar adicionar genero mesmo que nao exista e depois privatizar para pros
+
+              
+              //TODO implementar copiar o titulo para a clipboard tanto aqui quanto no botom sheet
+              //TODO implementar share na opçoes do anime tmbm
+              
             ),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(AppRoutes.CREATE_ANIME, arguments: anime);
-                  },
-                  style: ElevatedButton.styleFrom(primary: Colors.grey[800]),
-                  child: Row(
-                    children: const [
-                      Spacer(),
-                      Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        "Editar",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Spacer()
-                    ],
-                  )),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-                height: 100,
-                width: double.infinity,
-                child: Text(anime.description)),
-            LabeledChangebleButton(actualAnime: anime)
-          ],
-          //TODO implementar botao share
-          //TODO implementar botao deletar
-          //TODO implementar enviar anime para editar na tela de criação
-          //TODO implementar copiar o titulo para a clipboard tanto aqui quanto no botom sheet
-          //TODO implementar share na opçoes do anime tmbm
-          //TODO dar um jeito de manter o botao sempre em baixo e verificar se textos grandes aplicam rolagem
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }

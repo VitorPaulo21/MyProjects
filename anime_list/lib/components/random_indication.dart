@@ -3,21 +3,23 @@ import 'dart:math';
 import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/providers/delete_observer.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class RandomIndication extends StatefulWidget {
-  const RandomIndication({
+  RandomIndication({
     Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<RandomIndication> createState() => _RandomIndicationState();
 }
 
 class _RandomIndicationState extends State<RandomIndication> {
+  bool tela = false;
   List<Anime> animeList = [];
   List<Anime> randomAnimes = [];
   late Anime actualAnime;
@@ -25,6 +27,7 @@ class _RandomIndicationState extends State<RandomIndication> {
 
   @override
   void didChangeDependencies() {
+    tela = true;
     super.didChangeDependencies();
     animeList = Provider.of<AnimeList>(context, listen: false)
         .animeList
@@ -44,6 +47,7 @@ class _RandomIndicationState extends State<RandomIndication> {
 
   @override
   Widget build(BuildContext context) {
+   
     if (!(randomAnimes.length > 0)) {
       return SizedBox();
     } else {
@@ -117,8 +121,11 @@ class _RandomIndicationState extends State<RandomIndication> {
                                     builder: (ctx, animeList, _) => Container(
                                       child: InkWell(
                                         highlightColor: Colors.white,
-                                        onTap: () => animeList
-                                            .changePriority(actualAnime),
+                                        onTap: () {
+                                          tela = true;
+                                          animeList
+                                            .changePriority(actualAnime);
+                                            },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -149,8 +156,10 @@ class _RandomIndicationState extends State<RandomIndication> {
                                         primary: Colors.white,
                                       ),
                                       onPressed: () {
+                                        tela = true;
                                         animeListProvider
                                             .changeWacth(actualAnime);
+                                            
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -214,8 +223,11 @@ class _RandomIndicationState extends State<RandomIndication> {
                           ],
                         ),
                       ),
+                      if (tela)
                       Consumer<AnimeList>(
-                        builder: (ctx, animeList, _) => animeList.animeList
+                        builder: (ctx, animeList, _) {
+                          tela = false;
+                          return animeList.animeList
                                 .firstWhere(
                                     (oldAnime) => oldAnime == actualAnime)
                                 .isPrio
@@ -227,7 +239,8 @@ class _RandomIndicationState extends State<RandomIndication> {
                                   width: double.infinity,
                                 ),
                               )
-                            : const SizedBox(),
+                              : const SizedBox();
+                        }
                       ),
                     ],
                   ),

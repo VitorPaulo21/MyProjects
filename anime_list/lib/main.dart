@@ -1,5 +1,6 @@
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<AnimeList>(
           create: (_) => AnimeList(),
+        ),
+        ChangeNotifierProvider<DeleteObserver>(
+          create: (_) => DeleteObserver(),
         )
       ],
       child: MaterialApp(
