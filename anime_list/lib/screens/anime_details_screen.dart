@@ -3,8 +3,10 @@ import 'package:anime_list/components/labeled_changeble_button.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/utils/copy_to_clipboard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class AnimeDetailsScreen extends StatelessWidget {
@@ -93,11 +95,29 @@ class AnimeDetailsScreen extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                Text(
-                  anime.title,
-                  style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    copyToClipBoard(context, anime.title);
+                  },
+                  child: Row(
+                    //TODO olhar como resolver o overflow do texto
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          anime.title,
+                          softWrap: true,
+                          style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Icon(Icons.copy),
+                      )
+                    ],
                   ),
                 ),
                 if (anime.watched)
@@ -232,9 +252,6 @@ class AnimeDetailsScreen extends StatelessWidget {
                 
               ],
               //TODO implementar usar foto padrao quando nao houver
-              //TODO implementar adicionar genero mesmo que nao exista e depois privatizar para pros
-
-              
               //TODO implementar copiar o titulo para a clipboard tanto aqui quanto no botom sheet
               //TODO implementar share na opçoes do anime tmbm
               

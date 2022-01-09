@@ -43,7 +43,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
       if (isValidImage) {
         anime["imgUrl"] = ImgUrl;
       }
-      Provider.of<AnimeList>(context,listen: false).addAnime(anime);
+      Provider.of<AnimeList>(context, listen: false).addAnime(anime);
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       } else {
@@ -51,14 +51,15 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
       }
     }
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     Object? obj = ModalRoute.of(context)?.settings.arguments;
     if (obj.runtimeType != Null && !edited) {
-    setState(() {
-      edited = true;
-      Anime animeOld = obj as Anime;
+      setState(() {
+        edited = true;
+        Anime animeOld = obj as Anime;
         anime["id"] = animeOld.id;
         anime["title"] = animeOld.title;
         anime["desc"] = animeOld.description;
@@ -85,9 +86,10 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
             isPrio = anime["prio"] as bool;
           }
         }
-    });
+      });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -97,21 +99,23 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         } else {
           Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
         }
-        
+
         return Future.value(true);
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text("Adicionar Anime"),
           centerTitle: true,
-          leading: IconButton(onPressed: () {
-        if (Navigator.of(context).canPop()) {
+          leading: IconButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
                   Navigator.of(context).pop();
                 } else {
                   Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
                 }
                 ;
-          }, icon: const Icon(Icons.arrow_back)),
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
         body: WillPopScope(
           onWillPop: () {
@@ -152,7 +156,7 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                           fit: BoxFit.cover,
                                           errorBuilder: (ctx, obj, _) {
                                             isValidImage = false;
-    
+
                                             return Container(
                                               height: 180,
                                               width: 115,
@@ -217,7 +221,9 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 TextFormField(
-                                  initialValue: anime.containsKey("title") ? anime["title"].toString() : "",
+                                  initialValue: anime.containsKey("title")
+                                      ? anime["title"].toString()
+                                      : "",
                                   cursorColor: Colors.white,
                                   textInputAction: TextInputAction.next,
                                   maxLength: 50,
@@ -240,11 +246,9 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                   minLines: 3,
                                   maxLength: 200,
                                   decoration: DecorationWithLabel("Descriçâo:"),
-                                  
                                   onSaved: (desc) {
                                     if (desc.toString().trim().isNotEmpty) {
-                                    anime["desc"] = desc ?? "";
-                                      
+                                      anime["desc"] = desc ?? "";
                                     }
                                   },
                                 )
@@ -268,8 +272,8 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                   child: InputChip(
                                     label: Text(e),
                                     avatar: CircleAvatar(
-                                      child: Text(
-                                          e.substring(0, e.length >= 2 ? 2 : 1)),
+                                      child: Text(e.substring(
+                                          0, e.length >= 2 ? 2 : 1)),
                                     ),
                                     onDeleted: () => setState(() {
                                       genders.remove(e);
@@ -284,8 +288,8 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                       ),
                     TypeAheadFormField<String?>(
                       validator: (text) {
-                      
-                        if (text.toString().trim().isNotEmpty && genders.length == 3) {
+                        if (text.toString().trim().isNotEmpty &&
+                            genders.length == 3) {
                           return "Só pode haver no máximo 3 gêneros";
                         }
                       },
@@ -306,6 +310,20 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                       ),
                       autoFlipDirection: true,
                       textFieldConfiguration: TextFieldConfiguration(
+                        onChanged: (txt){
+                           if (genders.length == 3) {
+                              data.currentState?.validate();
+                            }
+                        },
+                          onSubmitted: (txt) {
+                            if (genders.length == 3) {
+                              data.currentState?.validate();
+                            } else {
+                              setState(() {
+                                genders.add(txt);
+                              });
+                            }
+                          },
                           cursorColor: Colors.white,
                           decoration: DecorationWithLabel("Generos"),
                           controller: genderController,
@@ -365,8 +383,10 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                                     Theme.of(context).colorScheme.secondary,
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
-                                label:  Text(
-                                  Navigator.of(context).canPop() ? "Salvar" : "Adicionar",
+                                label: Text(
+                                  Navigator.of(context).canPop()
+                                      ? "Salvar"
+                                      : "Adicionar",
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
