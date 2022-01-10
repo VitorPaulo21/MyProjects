@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:anime_list/components/finish_anime_dialog.dart';
 import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/delete_observer.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +49,6 @@ class _RandomIndicationState extends State<RandomIndication> {
 
   @override
   Widget build(BuildContext context) {
-   
     if (!(randomAnimes.length > 0)) {
       return SizedBox();
     } else {
@@ -123,9 +124,8 @@ class _RandomIndicationState extends State<RandomIndication> {
                                         highlightColor: Colors.white,
                                         onTap: () {
                                           tela = true;
-                                          animeList
-                                            .changePriority(actualAnime);
-                                            },
+                                          animeList.changePriority(actualAnime);
+                                        },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -157,9 +157,26 @@ class _RandomIndicationState extends State<RandomIndication> {
                                       ),
                                       onPressed: () {
                                         tela = true;
-                                        animeListProvider
-                                            .changeWacth(actualAnime);
-                                            
+                                        if (actualAnime.watching) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (ctx) {
+                                                return FinishAnimeDialog();
+                                              }).then((value) {
+                                            bool result = value ?? false;
+                                            if (result) {
+                                              animeListProvider
+                                                  .changeFinalized(actualAnime);
+                                              Navigator.of(context)
+                                                  .pushReplacementNamed(
+                                                      AppRoutes.HOME);
+                                            }
+                                          });
+                                        } else {
+                                          animeListProvider
+                                              .changeWacth(actualAnime);
+
+                                        }
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -175,9 +192,7 @@ class _RandomIndicationState extends State<RandomIndication> {
                                             width: 3,
                                           ),
                                           Text(
-                                            //TODO implementar o cntinuar assistindo se
-                                            // ja estiver assistido, e remover o a anime
-                                            // da lista de randoms se ele ja estiver assistido
+                                            
                                             actualAnime.watching
                                                 ? "Finalizar"
                                                 : "Assistir",
@@ -195,6 +210,12 @@ class _RandomIndicationState extends State<RandomIndication> {
                                     child: GestureDetector(
                                       onTap: () {
                                         showModalBottomSheet(
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(15),
+                                                    topRight:
+                                                        Radius.circular(15))),
                                             context: context,
                                             builder: (ctx) =>
                                                 InfoBotomSheet(actualAnime));
@@ -224,24 +245,22 @@ class _RandomIndicationState extends State<RandomIndication> {
                         ),
                       ),
                       if (tela)
-                      Consumer<AnimeList>(
-                        builder: (ctx, animeList, _) {
+                        Consumer<AnimeList>(builder: (ctx, animeList, _) {
                           tela = false;
                           return animeList.animeList
-                                .firstWhere(
-                                    (oldAnime) => oldAnime == actualAnime)
-                                .isPrio
-                            ? const Banner(
-                                message: "Prioridade",
-                                location: BannerLocation.topEnd,
-                                child: SizedBox(
-                                  height: 450,
-                                  width: double.infinity,
-                                ),
-                              )
+                                  .firstWhere(
+                                      (oldAnime) => oldAnime == actualAnime)
+                                  .isPrio
+                              ? const Banner(
+                                  message: "Prioridade",
+                                  location: BannerLocation.topEnd,
+                                  child: SizedBox(
+                                    height: 450,
+                                    width: double.infinity,
+                                  ),
+                                )
                               : const SizedBox();
-                        }
-                      ),
+                        }),
                     ],
                   ),
                 ),

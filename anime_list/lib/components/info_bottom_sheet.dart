@@ -1,8 +1,11 @@
 import 'package:anime_list/components/anime_list_grid_item.dart';
+import 'package:anime_list/components/finish_anime_dialog.dart';
+import 'package:anime_list/components/reestart_watching_dialog.dart';
 import 'package:anime_list/components/row_anime_list_item.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/utils/copy_to_clipboard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,36 +39,53 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 145,
-                          child: Text(
-                            anime.title,
-                            softWrap: true,
-                            style: const TextStyle(
-                                fontSize: 19, fontWeight: FontWeight.bold),
+                child: SingleChildScrollView(
+                  child: Column(
+                    
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: ()  {
+                              Navigator.of(context).pop();
+                              copyToClipBoard(context, anime.title);
+                            },
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width - 165,
+                              child: Text(
+                                anime.title,
+                                softWrap: true,
+                                style: const TextStyle(
+                                    fontSize: 19, fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ),
-                        ),
-                        GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Icon(Icons.cancel))
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 118,
-                      child: Text(
-                        anime.description,
-                        softWrap: true,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                                copyToClipBoard(context, anime.title);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(right: 4),
+                              child: const Icon(Icons.copy, size: 18,))),
+                          GestureDetector(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Icon(Icons.cancel))
+                        ],
                       ),
-                    )
-                  ],
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 118,
+                        child: Text(
+                          anime.description,
+                          softWrap: true,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
@@ -79,9 +99,41 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                 width: MediaQuery.of(context).size.width * 0.5,
                 child: ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      animeList.changeWacth(anime);
-                    });
+                    
+                      if (anime.watched) {
+                        
+                        showDialog(context: context, builder: (ctx) {
+                          return ReestartWatching();
+                        },).then((value) {
+                        bool result = value ?? false;
+                        if (result) {
+                          setState(() {
+                            
+                         animeList.changeWacth(anime);
+                          });
+                        }
+                        } 
+                        );
+                      } else if (anime.watching) {
+                        showDialog(context: context, builder: (ctx) {
+                          return FinishAnimeDialog();
+                        }).then((value) {
+                        bool result = value ?? false;
+                        if (result) {
+                          setState(() {
+                            animeList.changeFinalized(anime);
+                            Navigator.of(context)
+                                .pushReplacementNamed(AppRoutes.HOME);
+                          });
+                        }
+                      });
+                      } else {
+                        setState(() {
+                        animeList.changeWacth(anime);
+                      });
+                      }
+                      
+                    
                   },
                   child: Row(
                     children: [
@@ -106,20 +158,43 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                 ),
               ),
               Expanded(
-                  child: InkWell(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      
+                      InkWell(
                 onTap: () {
-                  animeList.changePrio(anime);
+                      animeList.changePrio(anime);
                 },
                 child: Container(
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      Icon(anime.isPrio ? Icons.check : Icons.add),
-                      Text("Prioridade")
-                    ],
-                  ),
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Icon(anime.isPrio ? Icons.check : Icons.add),
+                          Text("Prioridade")
+                        ],
+                      ),
                 ),
-              ))
+              ),
+              InkWell(
+                    onTap: () {
+                      //TODO implement share here
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: const [
+                          Icon(
+                            Icons.share_outlined,
+                            size: 23,
+                          ),
+                          Text("Compartilhar")
+                        ],
+                      ),
+                    ),
+                  ),
+                    ],
+                  ))
             ],
           ),
           Divider(

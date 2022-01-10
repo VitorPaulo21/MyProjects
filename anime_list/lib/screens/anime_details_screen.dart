@@ -1,5 +1,7 @@
+import 'package:anime_list/components/finish_anime_dialog.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/components/labeled_changeble_button.dart';
+import 'package:anime_list/components/reestart_watching_dialog.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
@@ -100,16 +102,18 @@ class AnimeDetailsScreen extends StatelessWidget {
                     copyToClipBoard(context, anime.title);
                   },
                   child: Row(
-                    //TODO olhar como resolver o overflow do texto
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       FittedBox(
-                        child: Text(
-                          anime.title,
-                          softWrap: true,
-                          style: const TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
+                        child: Container(
+                          width: constraints.maxWidth * 0.85,
+                          child: Text(
+                            anime.title,
+                            softWrap: true,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -174,7 +178,38 @@ class AnimeDetailsScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                       onPressed: () {
-                        animeList.changeWacth(anime);
+                         if (anime.watched) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) {
+                              return ReestartWatching();
+                            },
+                          ).then((value) {
+                            bool result = value ?? false;
+                            if (result) {
+                              
+                                animeList.changeWacth(anime);
+                              
+                            }
+                          });
+                        } else if (anime.watching) {
+                          showDialog(
+                              context: context,
+                              builder: (ctx) {
+                                return FinishAnimeDialog();
+                              }).then((value) {
+                            bool result = value ?? false;
+                            if (result) {
+                              
+                                animeList.changeFinalized(anime);
+                              
+                            }
+                          });
+                        } else {
+                          
+                            animeList.changeWacth(anime);
+                          
+                        }
                       },
                       style: ElevatedButton.styleFrom(primary: Colors.white),
                       child: Row(
@@ -227,8 +262,8 @@ class AnimeDetailsScreen extends StatelessWidget {
                 ),
                 Text(
                   " ${anime.genero.fold("Genero: ", (previousValue, element) {
-                    return previousValue.toString() + "," + element ;
-                  }).toString().replaceFirst(",", "")}",
+                        return previousValue.toString() + "," + element;
+                      }).toString().replaceFirst(",", "")}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -238,22 +273,15 @@ class AnimeDetailsScreen extends StatelessWidget {
                   height: 10,
                 ),
                 Container(
-                  height: anime.isPrio && anime.watched
-                      ? constraints.maxHeight * 0.17
-                      : anime.watched
-                          ? constraints.maxHeight * 0.235
-                          : anime.isPrio
-                              ? constraints.maxHeight * 0.20
-                              : constraints.maxHeight * 0.27,
+                  
+                  height: 150,
                   width: double.infinity,
-                  child: SingleChildScrollView(
-                      child: Text("Desc: ${anime.description}")),
+                  child: Text("Desc: ${anime.description}"),
                 ),
-                
               ],
+              
               //TODO implementar usar foto padrao quando nao houver
-              //TODO implementar copiar o titulo para a clipboard tanto aqui quanto no botom sheet
-              //TODO implementar share na opçoes do anime tmbm
+              //TODO implementar importar imagem da galeria
               
             ),
           ),

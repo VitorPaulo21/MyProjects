@@ -27,8 +27,8 @@ class AnimeListGridItem extends StatelessWidget {
                   showModalBottomSheet(
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10))),
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15))),
                       context: context,
                       builder: (ctx) => InfoBotomSheet(anime));
                 },

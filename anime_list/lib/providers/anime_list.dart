@@ -14,6 +14,13 @@ class AnimeList with ChangeNotifier {
         !anime.isPrio;
     notifyListeners();
   }
+  void changeFinalized(Anime anime) {
+    Anime animeFinal =
+        _animeList.lastWhere((oldElement) => oldElement == anime);
+    animeFinal.watching = false;
+    animeFinal.watched = true;
+    notifyListeners();
+  }
 
   void addAnime(Map<String, Object> anime) {
     if (anime.containsKey("id")) {
@@ -94,6 +101,7 @@ class AnimeList with ChangeNotifier {
   void changeWacth(Anime anime) {
     Anime updatedAnime = findFirst(anime);
     updatedAnime.watching = !updatedAnime.watching;
+    updatedAnime.watched = false;
     notifyListeners();
   }
 
