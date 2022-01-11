@@ -54,7 +54,7 @@ class AnimeDetailsScreen extends StatelessWidget {
                     ])
           ],
         ),
-        bottomSheet:  Padding(
+        bottomSheet: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
@@ -93,6 +93,10 @@ class AnimeDetailsScreen extends StatelessWidget {
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorWidget: (ctx, txt, _) => Image.asset(
+                    "lib/assets/PikPng.com_luffy-png_1127171.png",
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -178,7 +182,7 @@ class AnimeDetailsScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                       onPressed: () {
-                         if (anime.watched) {
+                        if (anime.watched) {
                           showDialog(
                             context: context,
                             builder: (ctx) {
@@ -187,9 +191,7 @@ class AnimeDetailsScreen extends StatelessWidget {
                           ).then((value) {
                             bool result = value ?? false;
                             if (result) {
-                              
-                                animeList.changeWacth(anime);
-                              
+                              animeList.changeWacth(anime);
                             }
                           });
                         } else if (anime.watching) {
@@ -200,15 +202,11 @@ class AnimeDetailsScreen extends StatelessWidget {
                               }).then((value) {
                             bool result = value ?? false;
                             if (result) {
-                              
-                                animeList.changeFinalized(anime);
-                              
+                              animeList.changeFinalized(anime);
                             }
                           });
                         } else {
-                          
-                            animeList.changeWacth(anime);
-                          
+                          animeList.changeWacth(anime);
                         }
                       },
                       style: ElevatedButton.styleFrom(primary: Colors.white),
@@ -273,16 +271,13 @@ class AnimeDetailsScreen extends StatelessWidget {
                   height: 10,
                 ),
                 Container(
-                  
                   height: 150,
                   width: double.infinity,
                   child: Text("Desc: ${anime.description}"),
                 ),
               ],
-              
-              //TODO implementar usar foto padrao quando nao houver
+
               //TODO implementar importar imagem da galeria
-              
             ),
           ),
         ));

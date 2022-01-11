@@ -3,6 +3,7 @@ import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,11 +22,15 @@ class ContinueWatchingListItem extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Image.network(
-                  anime.imageUrl,
+                CachedNetworkImage(
+                  imageUrl: anime.imageUrl,
                   fit: BoxFit.cover,
                   height: 170,
                   width: 125,
+                  errorWidget: (ctx, txt, _) => Image.asset(
+                    "lib/assets/PikPng.com_luffy-png_1127171.png",
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 Container(
                   width: 50,

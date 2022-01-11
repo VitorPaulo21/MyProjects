@@ -19,6 +19,10 @@ class AnimeListGridItem extends StatelessWidget {
               width: constraints.maxWidth,
               height: constraints.maxHeight,
               fit: BoxFit.cover,
+              errorWidget: (ctx, txt, _) => Image.asset(
+                "lib/assets/PikPng.com_luffy-png_1127171.png",
+                fit: BoxFit.cover,
+              ),
             ),
             Material(
               color: Colors.transparent,

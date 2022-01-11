@@ -6,6 +6,7 @@ import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -68,11 +69,15 @@ class _RandomIndicationState extends State<RandomIndication> {
                       CarouselSlider.builder(
                           itemCount: randomAnimes.length,
                           itemBuilder: (ctx, index, realindex) {
-                            return Image.network(
-                              randomAnimes[index].imageUrl,
+                            return CachedNetworkImage(
+                              imageUrl: randomAnimes[index].imageUrl,
                               height: 450,
                               width: double.infinity,
                               fit: BoxFit.cover,
+                              errorWidget: (ctx, txt, _) => Image.asset(
+                                "lib/assets/PikPng.com_luffy-png_1127171.png",
+                                fit: BoxFit.cover,
+                              ),
                             );
                           },
                           options: CarouselOptions(

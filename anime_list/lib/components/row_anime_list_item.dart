@@ -19,6 +19,10 @@ class RowAnimeListItem extends StatelessWidget {
             height: 180,
             width: 115,
             fit: BoxFit.cover,
+            errorWidget: (ctx, txt, _) => Image.asset(
+              "lib/assets/PikPng.com_luffy-png_1127171.png",
+              fit: BoxFit.cover,
+            ),
           ),
           Material(
             color: Colors.transparent,
