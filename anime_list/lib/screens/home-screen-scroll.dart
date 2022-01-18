@@ -44,7 +44,7 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
           backgroundColor: Colors.black54,
           flexibleSpace: const FlexibleSpaceBar(
             centerTitle: true,
-            title: Text("My Animes"),
+            title: Text("Mina tu é foda"),
           ),
           leading: Padding(
             padding: const EdgeInsets.all(10.0),

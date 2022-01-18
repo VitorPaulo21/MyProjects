@@ -31,7 +31,7 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
      
       floatingActionButton: _currentIndex == 0 ? FloatingActionButton(
         
-        child: Icon(Icons.add, color: Colors.white),
+              child: Icon(Icons.add, color: Colors.white),
         onPressed: () {
           Navigator.of(context).pushReplacementNamed(AppRoutes.CREATE_ANIME);
         },

@@ -1,3 +1,5 @@
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:anime_list/data/dummy_data.dart';
@@ -5,15 +7,45 @@ import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 
 class AnimeList with ChangeNotifier {
-  List<Anime> _animeList = data().DUMMY_ANIMES;
+  List<Anime> _animeList = [];
+  String baseUrl = "https://stormapp-80b5f.firebaseio.com";
+  String connectUrl = "/VitorAnimes2.json";
+  AnimeList() {
+    _getAnimes();
+  }
+  Future<void> _getAnimes() async {
+    await get(Uri.parse(baseUrl + connectUrl)).then((value) {
+      final loadedData = jsonDecode(
+        value.body,
+      ) as Map<String, dynamic>;
+      loadedData.forEach((key, value) {
+       Map<String, dynamic> entry =
+            (value as LinkedHashMap<String, dynamic>).cast();
+
+        _animeList.add(Anime(
+          id: entry["id"].runtimeType == Null ? "" : entry["id"],
+          genero: (entry["genero"]),
+          title: entry["title"].runtimeType == Null ? "" : entry["title"],
+          description: entry["description"].runtimeType == Null ? "" : entry["description"],
+          imageUrl: entry["imgUrl"].runtimeType == Null ? "" : entry["imgUrl"],
+          isPrio: entry["isPrio"],
+          watched: entry["watched"],
+          watching: entry["watching"],
+        ));
+      });
+
+    });
+  }
 
   void changePriority(Anime anime) {
     _animeList.lastWhere((oldElement) => oldElement == anime).isPrio =
         !anime.isPrio;
     notifyListeners();
   }
+
   void changeFinalized(Anime anime) {
     Anime animeFinal =
         _animeList.lastWhere((oldElement) => oldElement == anime);
@@ -27,7 +59,28 @@ class AnimeList with ChangeNotifier {
       updateAnime(anime);
       return;
     }
-    print(anime["title"].toString());
+    String baseUrl = "https://stormapp-80b5f.firebaseio.com";
+    Anime newAnime = mapToAnime(anime);
+    post(Uri.parse("$baseUrl/Animes.json"),
+        body: jsonEncode({
+          "Ass": newAnime.watched,
+          "delete": newAnime.id,
+          "desc": newAnime.description,
+          "genero": newAnime.genero,
+          "prio": newAnime.isPrio,
+          "titulo": newAnime.title,
+          "url": newAnime.imageUrl,
+          "watch": newAnime.watching
+        })).then((response) {
+      String id = jsonDecode(response.body)["name"];
+      put(Uri.parse("$baseUrl/VitorAnimes2.json/$id"),
+          body: jsonEncode({"id": id}));
+    });
+    _animeList.add(newAnime);
+    notifyListeners();
+  }
+
+  Anime mapToAnime(Map<String, Object> anime) {
     Anime newAnime = Anime(
       id: anime.containsKey("id")
           ? anime["id"].toString()
@@ -40,8 +93,7 @@ class AnimeList with ChangeNotifier {
     if (anime.containsKey("imgUrl")) {
       newAnime.setImageUrl(anime["imgUrl"].toString());
     }
-    _animeList.add(newAnime);
-    notifyListeners();
+    return newAnime;
   }
 
   void updateAnime(Map<String, Object> anime) {
@@ -98,6 +150,7 @@ class AnimeList with ChangeNotifier {
   List<Anime> get prioAnimes {
     return _animeList.where((anime) => anime.isPrio && !anime.watched).toList();
   }
+
   void changeWacth(Anime anime) {
     Anime updatedAnime = findFirst(anime);
     updatedAnime.watching = !updatedAnime.watching;
@@ -121,16 +174,16 @@ class AnimeList with ChangeNotifier {
 
   void deleteAnime(Anime anime, BuildContext context) {
     _animeList.removeWhere((element) => element == anime);
-    
+
     notifyListeners();
   }
-  List<Anime> getListWithFilters({
-    bool watching = true,
-    bool prio = true,
-    bool normal = true,
-    bool watched = true,
-      ListTipe? listTipe
-  }) {
+
+  List<Anime> getListWithFilters(
+      {bool watching = true,
+      bool prio = true,
+      bool normal = true,
+      bool watched = true,
+      ListTipe? listTipe}) {
     if (listTipe != null) {
       if (listTipe == ListTipe.ALL) {
         watching = true;
