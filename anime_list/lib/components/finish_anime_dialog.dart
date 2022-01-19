@@ -1,4 +1,6 @@
+import 'package:anime_list/providers/anime_list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FinishAnimeDialog extends StatelessWidget {
   const FinishAnimeDialog({Key? key}) : super(key: key);
@@ -10,13 +12,18 @@ class FinishAnimeDialog extends StatelessWidget {
       content: const Text("Deseja mesmo concluir este anime?"),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () {
+              Provider.of<AnimeList>(context, listen: false).getRandomAnimes();
+              Navigator.of(context).pop(true);
+            },
             child: const Text(
               "Sim",
               style: TextStyle(color: Colors.white),
             )),
         TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
             child: const Text(
               "Não",
               style: TextStyle(color: Colors.white),

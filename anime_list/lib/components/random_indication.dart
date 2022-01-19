@@ -21,7 +21,7 @@ class RandomIndication extends StatefulWidget {
   State<RandomIndication> createState() => _RandomIndicationState();
 }
 
-class _RandomIndicationState extends State<RandomIndication> {
+class _RandomIndicationState  extends State<RandomIndication>{
   bool tela = false;
   List<Anime> animeList = [];
   List<Anime> randomAnimes = [];
@@ -31,25 +31,17 @@ class _RandomIndicationState extends State<RandomIndication> {
   @override
   void didChangeDependencies() {
     tela = true;
-    super.didChangeDependencies();
-    animeList = Provider.of<AnimeList>(context, listen: false)
-        .animeList
-        .where((anime) => !anime.watched)
-        .toList();
-    animeList.shuffle();
-    if (animeList.length >= 3) {
-      randomAnimes = [animeList[0], animeList[1], animeList[2]];
-    } else if (animeList.length > 0) {
-      for (int i = 0; i < animeList.length; i++) {
-        randomAnimes.add(animeList[i]);
-      }
-    } else {
-      randomAnimes = [];
-    }
-  }
+     
 
+     
+
+  }
   @override
   Widget build(BuildContext context) {
+        randomAnimes = 
+            Provider.of<AnimeList>(context).randomAnimes;
+    
+    
     if (!(randomAnimes.length > 0)) {
       return SizedBox();
     } else {

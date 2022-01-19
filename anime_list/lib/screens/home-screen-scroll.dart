@@ -34,58 +34,67 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
   
   Widget build(BuildContext context) {
     DeleteObserver deleteObserver = Provider.of<DeleteObserver>(context);
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          // expandedHeight: 150,
-          pinned: true,
-          floating: true,
-          snap: true,
-          backgroundColor: Colors.black54,
-          flexibleSpace: const FlexibleSpaceBar(
-            centerTitle: true,
-            title: Text("Mina tu é foda"),
-          ),
-          leading: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset("lib/assets/profile.png")),
-          ),
-          actions: [
-            PopupMenuButton<ListTile>(
-                icon: Icon(Icons.search),
-                itemBuilder: (ctx) => <PopupMenuEntry<ListTile>>[
-                      PopupMenuItem<ListTile>(
-                          child: ListTile(
-                        enabled: true,
-                        leading: Container(
-                          height: 70,
-                          child: const Icon(
-                            Icons.search,
-                            color: Colors.white,
+    return RefreshIndicator(
+      onRefresh: () {
+        Provider.of<AnimeList>(context, listen: false).getRandomAnimes();
+        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        return Future.value(true);
+      },
+      color: Colors.white,
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            // expandedHeight: 150,
+            pinned: true,
+            floating: true,
+            snap: true,
+            backgroundColor: Colors.black54,
+            flexibleSpace: const FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text("My Animes"),
+            ),
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset("lib/assets/profile.png")),
+            ),
+            actions: [
+              PopupMenuButton<ListTile>(
+                  icon: Icon(Icons.search),
+                  itemBuilder: (ctx) => <PopupMenuEntry<ListTile>>[
+                        PopupMenuItem<ListTile>(
+                            child: ListTile(
+                          enabled: true,
+                          leading: Container(
+                            height: 70,
+                            child: const Icon(
+                              Icons.search,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        title: Container(
-                          height: 70,
-                          width: 250,
-                          child: TextField(
-                            onSubmitted: (text) {
-                              Navigator.of(context).pushReplacementNamed(
-                                  AppRoutes.ANIME_LIST,
-                                  arguments: {"query": text});
-                            },
-                            textInputAction: TextInputAction.search,
-                            cursorColor: Colors.white,
-                            decoration: DecorationWithLabel("Pesquisar Anime"),
+                          title: Container(
+                            height: 70,
+                            width: 250,
+                            child: TextField(
+                              onSubmitted: (text) {
+                                Navigator.of(context).pushReplacementNamed(
+                                    AppRoutes.ANIME_LIST,
+                                    arguments: {"query": text});
+                              },
+                              textInputAction: TextInputAction.search,
+                              cursorColor: Colors.white,
+                              decoration:
+                                  DecorationWithLabel("Pesquisar Anime"),
+                            ),
                           ),
-                        ),
-                      ))
-                    ])
-          ],
-        ),
-        SliverToBoxAdapter(child: HomeScreen()),
-      ],
+                        ))
+                      ])
+            ],
+          ),
+          SliverToBoxAdapter(child: HomeScreen()),
+        ],
+      ),
     );
   }
 }

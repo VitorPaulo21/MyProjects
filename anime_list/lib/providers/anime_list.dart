@@ -11,33 +11,54 @@ import 'package:http/http.dart';
 
 class AnimeList with ChangeNotifier {
   List<Anime> _animeList = [];
+  List<Anime> randomAnimes = [];
   String baseUrl = "https://stormapp-80b5f.firebaseio.com";
-  String connectUrl = "/VitorAnimes2.json";
+  String connectUrl = "/Animes.json";
   AnimeList() {
-    _getAnimes();
+    getAnimes();
   }
-  Future<void> _getAnimes() async {
+  Future<List<Anime>> getAnimes() async {
     await get(Uri.parse(baseUrl + connectUrl)).then((value) {
       final loadedData = jsonDecode(
         value.body,
       ) as Map<String, dynamic>;
       loadedData.forEach((key, value) {
-       Map<String, dynamic> entry =
+        Map<String, dynamic> entry =
             (value as LinkedHashMap<String, dynamic>).cast();
-
         _animeList.add(Anime(
           id: entry["id"].runtimeType == Null ? "" : entry["id"],
           genero: (entry["genero"] as List<dynamic>).cast<String>(),
           title: entry["title"].runtimeType == Null ? "" : entry["title"],
-          description: entry["description"].runtimeType == Null ? "" : entry["description"],
-          imageUrl: entry["imgUrl"].runtimeType == Null ? "" : entry["imgUrl"],
+          description: entry["description"].runtimeType == Null
+              ? ""
+              : entry["description"],
+          imageUrl:
+              entry["imageUrl"].runtimeType == Null ? "" : entry["imageUrl"],
           isPrio: entry["isPrio"],
           watched: entry["watched"],
           watching: entry["watching"],
         ));
       });
-
     });
+    getRandomAnimes();
+    notifyListeners();
+    return _animeList;
+  }
+
+  void getRandomAnimes() {
+    randomAnimes.clear();
+    List<Anime> animeList =
+        _animeList.where((anime) => !anime.watched).toList();
+    animeList.shuffle();
+    if (animeList.length >= 3) {
+      randomAnimes = [animeList[0], animeList[1], animeList[2]];
+    } else if (animeList.length > 0) {
+      for (int i = 0; i < animeList.length; i++) {
+        randomAnimes.add(animeList[i]);
+      }
+    } else {
+      randomAnimes = [];
+    }
   }
 
   void changePriority(Anime anime) {
@@ -59,18 +80,17 @@ class AnimeList with ChangeNotifier {
       updateAnime(anime);
       return;
     }
-    String baseUrl = "https://stormapp-80b5f.firebaseio.com";
     Anime newAnime = mapToAnime(anime);
-    post(Uri.parse("$baseUrl/Animes.json"),
+    post(Uri.parse(baseUrl + connectUrl),
         body: jsonEncode({
-          "Ass": newAnime.watched,
-          "delete": newAnime.id,
-          "desc": newAnime.description,
+          "id": newAnime.id,
+          "title": newAnime.title,
+          "description": newAnime.description,
           "genero": newAnime.genero,
-          "prio": newAnime.isPrio,
-          "titulo": newAnime.title,
-          "url": newAnime.imageUrl,
-          "watch": newAnime.watching
+          "imageUrl": newAnime.imageUrl,
+          "watched": newAnime.watched,
+          "watching": newAnime.watching,
+          "isPrio": newAnime.isPrio
         })).then((response) {
       String id = jsonDecode(response.body)["name"];
       put(Uri.parse("$baseUrl/VitorAnimes2.json/$id"),
