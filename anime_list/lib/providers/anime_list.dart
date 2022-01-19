@@ -27,7 +27,7 @@ class AnimeList with ChangeNotifier {
 
         _animeList.add(Anime(
           id: entry["id"].runtimeType == Null ? "" : entry["id"],
-          genero: (entry["genero"]),
+          genero: (entry["genero"] as List<dynamic>).cast<String>(),
           title: entry["title"].runtimeType == Null ? "" : entry["title"],
           description: entry["description"].runtimeType == Null ? "" : entry["description"],
           imageUrl: entry["imgUrl"].runtimeType == Null ? "" : entry["imgUrl"],
