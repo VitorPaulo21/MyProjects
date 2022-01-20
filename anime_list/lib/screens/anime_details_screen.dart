@@ -88,16 +88,19 @@ class AnimeDetailsScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CachedNetworkImage(
-                  imageUrl: anime.imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorWidget: (ctx, txt, _) => Image.asset(
-                    "lib/assets/PikPng.com_luffy-png_1127171.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                anime.imageUrl.isEmpty
+                    ? Image.asset(
+                        "lib/assets/PikPng.com_luffy-png_1127171.png",
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: anime.imageUrl,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                 const SizedBox(
                   height: 10,
                 ),

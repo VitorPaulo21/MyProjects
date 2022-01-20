@@ -11,6 +11,18 @@ class Anime {
     imageUrl = url;
   }
 
+Map<String, Object> getMap() {
+    return {
+      "id": id,
+      "title": title,
+      "description": description,
+      "genero": genero,
+      "imageUrl": imageUrl,
+      "watched": watched,
+      "watching": watching,
+      "isPrio": isPrio
+    };
+  }
 
   Anime(
       {required this.id,

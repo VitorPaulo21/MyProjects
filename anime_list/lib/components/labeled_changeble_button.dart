@@ -34,7 +34,7 @@ class LabeledChangebleButton extends StatelessWidget {
             highlightColor: Colors.white,
             onTap: () {
               if (function == labeledButtonFunctions.updatePrio) {
-                animeList.changePriority(actualAnime);
+                animeList.changePrio(actualAnime);
               }
               if (function == labeledButtonFunctions.share) {}
               if (function == labeledButtonFunctions.delete) {
@@ -66,6 +66,7 @@ class LabeledChangebleButton extends StatelessWidget {
                   bool delete = value ?? false;
 
                   if (delete) {
+                    print(delete);
                     animeList.deleteAnime(actualAnime, context);
                     Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
                   }

@@ -121,7 +121,7 @@ class _RandomIndicationState  extends State<RandomIndication>{
                                         highlightColor: Colors.white,
                                         onTap: () {
                                           tela = true;
-                                          animeList.changePriority(actualAnime);
+                                          animeList.changePrio(actualAnime);
                                         },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,

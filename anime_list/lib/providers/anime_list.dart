@@ -2,12 +2,12 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:anime_list/data/dummy_data.dart';
 import 'package:anime_list/models/anime.dart';
-import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
+
+
 
 class AnimeList with ChangeNotifier {
   List<Anime> _animeList = [];
@@ -61,17 +61,16 @@ class AnimeList with ChangeNotifier {
     }
   }
 
-  void changePriority(Anime anime) {
-    _animeList.lastWhere((oldElement) => oldElement == anime).isPrio =
-        !anime.isPrio;
-    notifyListeners();
-  }
-
   void changeFinalized(Anime anime) {
     Anime animeFinal =
         _animeList.lastWhere((oldElement) => oldElement == anime);
     animeFinal.watching = false;
     animeFinal.watched = true;
+    patch(Uri.parse("$baseUrl/Animes/${animeFinal.id}.json"),
+        body: jsonEncode({
+          "watched": animeFinal.watched,
+          "watching": animeFinal.watching,
+        }));
     notifyListeners();
   }
 
@@ -90,10 +89,10 @@ class AnimeList with ChangeNotifier {
           "imageUrl": newAnime.imageUrl,
           "watched": newAnime.watched,
           "watching": newAnime.watching,
-          "isPrio": newAnime.isPrio
+          "isPrio": newAnime.isPrio,
         })).then((response) {
       String id = jsonDecode(response.body)["name"];
-      put(Uri.parse("$baseUrl/VitorAnimes2.json/$id"),
+      patch(Uri.parse("$baseUrl/Animes/$id.json"),
           body: jsonEncode({"id": id}));
     });
     _animeList.add(newAnime);
@@ -140,8 +139,10 @@ class AnimeList with ChangeNotifier {
       animeList.insert(
           animeList.indexOf(findAnimeById(anime["id"].toString())!),
           animeUpdate);
+      put(Uri.parse("$baseUrl/Animes/${animeUpdate.id}.json"),
+          body: jsonEncode(animeUpdate.getMap()));
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   List<Anime> get animeList {
@@ -175,12 +176,25 @@ class AnimeList with ChangeNotifier {
     Anime updatedAnime = findFirst(anime);
     updatedAnime.watching = !updatedAnime.watching;
     updatedAnime.watched = false;
+    patch(Uri.parse("$baseUrl/Animes/${updatedAnime.id}.json"),
+        body: jsonEncode({
+          "watched": updatedAnime.watched,
+          "watching": updatedAnime.watching,
+        }));
     notifyListeners();
   }
 
   void changePrio(Anime anime) {
     Anime updatedAnime = findFirst(anime);
     updatedAnime.isPrio = !updatedAnime.isPrio;
+    patch(
+      Uri.parse("$baseUrl/Animes/${updatedAnime.id}.json"),
+      body: jsonEncode(
+        {
+          "isPrio": updatedAnime.isPrio,
+        },
+      ),
+    );
     notifyListeners();
   }
 
@@ -193,8 +207,15 @@ class AnimeList with ChangeNotifier {
   }
 
   void deleteAnime(Anime anime, BuildContext context) {
-    _animeList.removeWhere((element) => element == anime);
-
+    String id = "";
+    _animeList.removeWhere((element) {
+      id = element.id;
+      return element == anime;
+    });
+   
+    delete(
+      Uri.parse("$baseUrl/Animes/${anime.id}.json"),
+    );
     notifyListeners();
   }
 
