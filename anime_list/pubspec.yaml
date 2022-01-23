@@ -70,6 +70,7 @@ flutter:
     - lib/assets/profile.png
     - lib/assets/luffy_like.png
     - lib/assets/PikPng.com_luffy-png_1127171.png
+    - lib/assets/backgorund_image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

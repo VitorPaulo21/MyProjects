@@ -4,6 +4,7 @@ import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
+import 'package:anime_list/screens/login_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         )),
         debugShowCheckedModeBanner: false,
         routes: {
+          AppRoutes.AUTH: (_) => AuthScreen(),
           AppRoutes.HOME: (_) => AnimeListScreen(),
           AppRoutes.CREATE_ANIME: (_) => CreateAnimeScreen(),
           AppRoutes.ANIME_LIST: (_) => AnimesScreen(),
