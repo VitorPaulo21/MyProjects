@@ -14,24 +14,21 @@ class AuthScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           Container(
+            alignment: Alignment.center,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: ExactAssetImage("lib/assets/backgorund_image.jpg"),
+                  image: AssetImage("lib/assets/backgorund_image.jpg"),
                   fit: BoxFit.cover),
             ),
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: AuthForm(),
-              ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+              child: AuthForm(),
             ),
-          ),
+          )
         ],
-        alignment: Alignment.center,
       ),
     );
   }

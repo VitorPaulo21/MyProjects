@@ -3,8 +3,8 @@ import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
+import 'package:anime_list/screens/auth_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
-import 'package:anime_list/screens/login_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +31,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-            colorScheme: ColorScheme.dark().copyWith(
-          primary: Colors.grey[800],
-          secondary: Colors.red,
-          onPrimary: Colors.red,
-          onSecondary: Colors.white,
-        )),
+          colorScheme: ColorScheme.dark().copyWith(
+            primary: Colors.grey[800],
+            secondary: Colors.red,
+            onPrimary: Colors.red,
+            onSecondary: Colors.white,
+          ),
+          textSelectionTheme: Theme.of(context).textSelectionTheme.copyWith(
+                selectionHandleColor: Colors.red,
+              ),
+        ),
         debugShowCheckedModeBanner: false,
         routes: {
           AppRoutes.AUTH: (_) => AuthScreen(),
