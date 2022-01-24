@@ -36,6 +36,8 @@ class _AuthFormState extends State<AuthForm> {
                 height: 10,
               ),
               TextFormField(
+                autocorrect: false,
+                enableSuggestions: false,
                 cursorColor: Theme.of(context).colorScheme.secondary,
                 obscureText: isHidePassowrd,
                 decoration: InputDecoration(
@@ -45,7 +47,10 @@ class _AuthFormState extends State<AuthForm> {
                         isHidePassowrd = !isHidePassowrd;
                       });
                     },
-                    icon: Icon(Icons.visibility),
+                    icon: Icon(
+                      isHidePassowrd ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.white,
+                    ),
                   ),
                   label: const Text(
                     "senha:",
@@ -72,6 +77,8 @@ class _AuthFormState extends State<AuthForm> {
                 Column(
                   children: [
                     TextFormField(
+                      autocorrect: false,
+                      enableSuggestions: false,
                       cursorColor: Theme.of(context).colorScheme.secondary,
                       obscureText: isHidePassowrd,
                       decoration: InputDecoration(
@@ -81,7 +88,12 @@ class _AuthFormState extends State<AuthForm> {
                               isHidePassowrd = !isHidePassowrd;
                             });
                           },
-                          icon: Icon(Icons.visibility),
+                          icon: Icon(
+                            isHidePassowrd
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.white,
+                          ),
                         ),
                         label: const Text(
                           "repetir senha:",
