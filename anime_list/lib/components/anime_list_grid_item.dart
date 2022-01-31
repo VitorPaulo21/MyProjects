@@ -9,6 +9,7 @@ class AnimeListGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: LayoutBuilder(

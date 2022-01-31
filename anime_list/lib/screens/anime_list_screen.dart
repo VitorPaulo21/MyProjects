@@ -1,15 +1,7 @@
-import 'package:anime_list/components/animes_list_view.dart';
 import 'package:anime_list/components/animes_screen.dart';
-import 'package:anime_list/components/home_screen.dart';
-import 'package:anime_list/components/input_decoration_white.dart';
-import 'package:anime_list/components/random_indication.dart';
-import 'package:anime_list/components/titled_row_list.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
-import 'package:anime_list/utils/list_tipe.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 import 'home-screen-scroll.dart';

@@ -10,6 +10,7 @@ class RowAnimeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Stack(
@@ -21,6 +22,9 @@ class RowAnimeListItem extends StatelessWidget {
             fit: BoxFit.cover,
             errorWidget: (ctx, txt, _) => Image.asset(
               "lib/assets/PikPng.com_luffy-png_1127171.png",
+              
+            height: 180,
+            width: 115,
               fit: BoxFit.cover,
             ),
           ),

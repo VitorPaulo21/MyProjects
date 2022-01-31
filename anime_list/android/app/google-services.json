@@ -1,0 +1,65 @@
+{
+  "project_info": {
+    "project_number": "170413236488",
+    "firebase_url": "https://stormapp-80b5f.firebaseio.com",
+    "project_id": "stormapp-80b5f",
+    "storage_bucket": "stormapp-80b5f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170413236488:android:9cdea409842cb325e98cbd",
+        "android_client_info": {
+          "package_name": "com.StormApp.MyAnimes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFiaeFlwkLxeid3T4qXB2d_ZLX1GysvtU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170413236488-g3lmq2799imse6qm71o8j0obs1l5blo3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.animeList"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170413236488:android:39c21ab4f5dea46be98cbd",
+        "android_client_info": {
+          "package_name": "com.example.anime_list"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFiaeFlwkLxeid3T4qXB2d_ZLX1GysvtU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170413236488-g3lmq2799imse6qm71o8j0obs1l5blo3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.animeList"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

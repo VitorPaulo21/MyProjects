@@ -1,15 +1,23 @@
+
+
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/providers/anime_list.dart';
+import 'package:anime_list/providers/auth.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/auth_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
+import 'package:anime_list/screens/no_connection_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/screens/initial_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -22,10 +30,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AnimeList>(
-          create: (_) => AnimeList(),
+          create: (_) => AnimeList(context),
         ),
         ChangeNotifierProvider<DeleteObserver>(
           create: (_) => DeleteObserver(),
+        ),
+        ChangeNotifierProvider<Auth>(
+          create: (_) => Auth(),
         )
       ],
       child: MaterialApp(
@@ -43,11 +54,13 @@ class MyApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         routes: {
+          AppRoutes.INITIAL: (_) => InitialScreen(),
           AppRoutes.AUTH: (_) => AuthScreen(),
           AppRoutes.HOME: (_) => AnimeListScreen(),
           AppRoutes.CREATE_ANIME: (_) => CreateAnimeScreen(),
           AppRoutes.ANIME_LIST: (_) => AnimesScreen(),
           AppRoutes.ANIME_DETAILS: (_) => AnimeDetailsScreen(),
+          AppRoutes.NO_CONNECTION: (_) => NoConnectionScreen(),
         },
       ),
     );

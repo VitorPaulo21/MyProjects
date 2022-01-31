@@ -41,7 +41,6 @@ class _RandomIndicationState  extends State<RandomIndication>{
         randomAnimes = 
             Provider.of<AnimeList>(context).randomAnimes;
     
-    
     if (!(randomAnimes.length > 0)) {
       return SizedBox();
     } else {
@@ -68,6 +67,8 @@ class _RandomIndicationState  extends State<RandomIndication>{
                               fit: BoxFit.cover,
                               errorWidget: (ctx, txt, _) => Image.asset(
                                 "lib/assets/PikPng.com_luffy-png_1127171.png",
+                              height: 450,
+                              width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
                             );

@@ -18,6 +18,7 @@ class AnimeDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AnimeList animeList = Provider.of<AnimeList>(context);
     Anime anime = ModalRoute.of(context)?.settings.arguments as Anime;
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Detalhes do Anime"),

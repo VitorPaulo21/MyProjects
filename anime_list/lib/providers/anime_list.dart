@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+
 import 'dart:math';
 
 import 'package:anime_list/models/anime.dart';
@@ -14,7 +15,8 @@ class AnimeList with ChangeNotifier {
   List<Anime> randomAnimes = [];
   String baseUrl = "https://stormapp-80b5f.firebaseio.com";
   String connectUrl = "/Animes.json";
-  AnimeList() {
+  final BuildContext _context;
+  AnimeList(BuildContext context) : _context = context{
     getAnimes();
   }
   Future<List<Anime>> getAnimes() async {
@@ -42,6 +44,7 @@ class AnimeList with ChangeNotifier {
     });
     getRandomAnimes();
     notifyListeners();
+
     return _animeList;
   }
 
