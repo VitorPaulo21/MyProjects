@@ -72,12 +72,12 @@ class _AuthScreenState extends State<AuthScreen> {
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("lib/assets/backgorund_image.jpg"),
+                  image: AssetImage("lib/assets/backgorund_image2.jpg"),
                   fit: BoxFit.cover),
             ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-              child: AuthForm(),
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: const AuthForm(),
             ),
           )
         ],

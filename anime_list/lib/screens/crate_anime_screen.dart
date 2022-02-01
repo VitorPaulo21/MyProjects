@@ -37,16 +37,21 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         anime["genders"] = genders;
       }
       if (isPrio) {
-        print(isPrio);
         anime["prio"] = true;
       }
       if (isValidImage) {
+        if (ImgUrl == "") {
+          ImgUrl =
+              "https://firebasestorage.googleapis.com/v0/b/stormapp-80b5f.appspot.com/o/ImageAnime%2FAppImages%2FPikPng.com_luffy-png_1127171.png?alt=media&token=e25e4ffc-abca-48bf-ab7c-e7967d77016b";
+        }
         anime["imgUrl"] = ImgUrl;
       }
-      Provider.of<AnimeList>(context, listen: false).addAnime(anime);
+      AnimeList animeList = Provider.of<AnimeList>(context, listen: false);
+      animeList.addAnime(anime);
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       } else {
+        animeList.getAnimes();
         Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
       }
     }
@@ -295,32 +300,55 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
                       },
                       direction: AxisDirection.up,
                       // hideOnEmpty: true,
+
                       hideOnError: true,
                       hideSuggestionsOnKeyboardHide: true,
                       suggestionsBoxController: sugestionBoxController,
-                      noItemsFoundBuilder: (ctx) => const ListTile(
-                        leading: Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                        ),
-                        title: Text(
-                          "Nenhum Gênero Encontrado",
-                          style: TextStyle(color: Colors.red),
+                      noItemsFoundBuilder: (ctx) => ListTile(
+                        
+                       
+                        title : TextButton(
+                          style: TextButton.styleFrom(alignment: Alignment.centerLeft),
+                          onPressed: () {
+                             if (genders.length == 3) {
+                              data.currentState?.validate();
+                              sugestionBoxController.close();
+                            } else { 
+                            setState(() {
+                              if (genderController.text.isNotEmpty) {
+                                genders.add(genderController.text);
+                                genderController.text = "";
+                                sugestionBoxController.close();
+                              }
+                            });
+
+                            }
+                          },
+                          child: Text(
+                            genderController.text,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17
+                            ),
+                          ),
                         ),
                       ),
                       autoFlipDirection: true,
                       textFieldConfiguration: TextFieldConfiguration(
-                        onChanged: (txt){
-                           if (genders.length == 3) {
+                          onChanged: (txt) {
+                            if (genders.length == 3) {
                               data.currentState?.validate();
                             }
-                        },
+                          },
                           onSubmitted: (txt) {
                             if (genders.length == 3) {
                               data.currentState?.validate();
+                              sugestionBoxController.close();
                             } else {
                               setState(() {
                                 genders.add(txt);
+                                genderController.text = "";
+                                sugestionBoxController.close();
                               });
                             }
                           },

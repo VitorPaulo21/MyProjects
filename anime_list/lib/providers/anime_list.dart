@@ -16,14 +16,18 @@ class AnimeList with ChangeNotifier {
   String baseUrl = "https://stormapp-80b5f.firebaseio.com";
   String connectUrl = "/Animes.json";
   final BuildContext _context;
+  bool isLoaded = false;
   AnimeList(BuildContext context) : _context = context{
     getAnimes();
   }
   Future<List<Anime>> getAnimes() async {
+    isLoaded = false;
     await get(Uri.parse(baseUrl + connectUrl)).then((value) {
-      final loadedData = jsonDecode(
+      dynamic decoded = jsonDecode(
         value.body,
-      ) as Map<String, dynamic>;
+      );
+      final loadedData =
+          decoded.runtimeType == Null ? {} : decoded as Map<String, dynamic>;
       loadedData.forEach((key, value) {
         Map<String, dynamic> entry =
             (value as LinkedHashMap<String, dynamic>).cast();
@@ -43,13 +47,18 @@ class AnimeList with ChangeNotifier {
       });
     });
     getRandomAnimes();
+    isLoaded = true;
     notifyListeners();
-
     return _animeList;
   }
 
   void getRandomAnimes() {
     randomAnimes.clear();
+    if (_animeList.isEmpty) {
+      randomAnimes = [];
+      notifyListeners();
+      return;
+    }
     List<Anime> animeList =
         _animeList.where((anime) => !anime.watched).toList();
     animeList.shuffle();
@@ -80,6 +89,7 @@ class AnimeList with ChangeNotifier {
   void addAnime(Map<String, Object> anime) {
     if (anime.containsKey("id")) {
       updateAnime(anime);
+      getRandomAnimes();
       return;
     }
     Anime newAnime = mapToAnime(anime);
@@ -95,10 +105,13 @@ class AnimeList with ChangeNotifier {
           "isPrio": newAnime.isPrio,
         })).then((response) {
       String id = jsonDecode(response.body)["name"];
+  
       patch(Uri.parse("$baseUrl/Animes/$id.json"),
           body: jsonEncode({"id": id}));
+    print("$baseUrl/Animes/$id.json");
     });
     _animeList.add(newAnime);
+    getRandomAnimes();
     notifyListeners();
   }
 
@@ -219,6 +232,8 @@ class AnimeList with ChangeNotifier {
     delete(
       Uri.parse("$baseUrl/Animes/${anime.id}.json"),
     );
+    print("$baseUrl/Animes/${anime.id}.json");
+    getRandomAnimes();
     notifyListeners();
   }
 

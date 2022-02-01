@@ -1,3 +1,5 @@
+
+
 import 'package:anime_list/components/random_indication.dart';
 import 'package:anime_list/components/titled_row_list.dart';
 import 'package:anime_list/providers/anime_list.dart';
@@ -18,52 +20,60 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AnimeList animeList = Provider.of<AnimeList>(context);
+    bool isLoaded = Provider.of<AnimeList>(context).isLoaded;
     return Column(
       children: [
+        if (animeList.randomAnimes.isNotEmpty)
         RandomIndication(),
         const SizedBox(
           height: 5,
         ),
-        if (animeList.animeList.length > 0)
+        if (animeList.animeList.length > 0 && isLoaded)
           TitledRowList(
             title: "Minha Lista",
             hasArrow: true,
             listTipe: ListTipe.ALL,
             onTap: () {},
           ),
-        if (animeList.watchingAnimes.length > 0)
+        if (animeList.watchingAnimes.length > 0 && isLoaded)
           TitledRowList(
             title: "Continue Assistino",
             hasArrow: true,
             listTipe: ListTipe.WATCHING,
             onTap: () {},
           ),
-        if (animeList.prioAnimes.length > 0)
+        if (animeList.prioAnimes.length > 0 && isLoaded)
           TitledRowList(
             title: "Lista de Prioridades",
             hasArrow: true,
             listTipe: ListTipe.PRIO,
             onTap: () {},
           ),
-        if (animeList.normalAnimes.length > 0)
+        if (animeList.normalAnimes.length > 0 && isLoaded)
           TitledRowList(
             title: "Lista sem Prioridades",
             hasArrow: true,
             listTipe: ListTipe.NORMAL,
             onTap: () {},
           ),
-        if (animeList.concluidolAnimes.length > 0)
+        if (animeList.concluidolAnimes.length > 0 && isLoaded)
           TitledRowList(
             title: "Lista de Assistidos",
             hasArrow: true,
             listTipe: ListTipe.FINISHED,
             onTap: () {},
           ),
-        if (!(animeList.animeList.length > 0))
+        if (!(animeList.animeList.length > 0) && isLoaded)
           NotFindScreen(),
         const SizedBox(
           height: 80,
         ),
+        if (!isLoaded)
+          const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          )
       ],
     );
   }

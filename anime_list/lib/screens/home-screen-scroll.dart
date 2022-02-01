@@ -29,15 +29,17 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-
+Future<void> refresh() async {
+    await Provider.of<AnimeList>(context, listen: false).getAnimes();
+  }
   @override
   
   Widget build(BuildContext context) {
     DeleteObserver deleteObserver = Provider.of<DeleteObserver>(context);
     return RefreshIndicator(
-      onRefresh: () {
-        Provider.of<AnimeList>(context, listen: false).getRandomAnimes();
-        Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+      onRefresh: () async {
+        await refresh();
+        // Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
         return Future.value(true);
       },
       color: Colors.white,
