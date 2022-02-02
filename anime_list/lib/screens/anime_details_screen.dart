@@ -183,7 +183,7 @@ class AnimeDetailsScreen extends StatelessWidget {
                           ).then((value) {
                             bool result = value ?? false;
                             if (result) {
-                              animeList.changeWacth(anime);
+                              animeList.changeWacth(anime, context);
                             }
                           });
                         } else if (anime.watching) {
@@ -194,11 +194,11 @@ class AnimeDetailsScreen extends StatelessWidget {
                               }).then((value) {
                             bool result = value ?? false;
                             if (result) {
-                              animeList.changeFinalized(anime);
+                              animeList.changeFinalized(anime, context);
                             }
                           });
                         } else {
-                          animeList.changeWacth(anime);
+                          animeList.changeWacth(anime, context);
                         }
                       },
                       style: ElevatedButton.styleFrom(primary: Colors.white),

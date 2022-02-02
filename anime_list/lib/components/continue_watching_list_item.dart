@@ -60,7 +60,7 @@ class ContinueWatchingListItem extends StatelessWidget {
                             }).then((value) {
                           bool result = value ?? false;
                           if (result) {
-                            animeList.changeFinalized(anime);
+                            animeList.changeFinalized(anime, context);
                             Navigator.of(context)
                                 .pushReplacementNamed(AppRoutes.HOME);
                           }
@@ -111,7 +111,7 @@ class ContinueWatchingListItem extends StatelessWidget {
                             }).then((value) {
                           bool result = value ?? false;
                           if (result) {
-                            animeList.changeFinalized(anime);
+                            animeList.changeFinalized(anime, context);
                             Navigator.of(context)
                                 .pushReplacementNamed(AppRoutes.HOME);
                           }

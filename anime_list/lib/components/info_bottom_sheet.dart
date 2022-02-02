@@ -109,7 +109,7 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                         if (result) {
                           setState(() {
                             
-                         animeList.changeWacth(anime);
+                            animeList.changeWacth(anime, context);
                           });
                         }
                         } 
@@ -121,7 +121,7 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                         bool result = value ?? false;
                         if (result) {
                           setState(() {
-                            animeList.changeFinalized(anime);
+                            animeList.changeFinalized(anime, context);
                             Navigator.of(context)
                                 .pushReplacementNamed(AppRoutes.HOME);
                           });
@@ -129,7 +129,7 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                       });
                       } else {
                         setState(() {
-                        animeList.changeWacth(anime);
+                        animeList.changeWacth(anime, context);
                       });
                       }
                       
@@ -164,7 +164,7 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                       
                       InkWell(
                 onTap: () {
-                      animeList.changePrio(anime);
+                      animeList.changePrio(anime, context);
                 },
                 child: Container(
                       alignment: Alignment.center,

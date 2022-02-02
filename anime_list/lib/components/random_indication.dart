@@ -122,7 +122,8 @@ class _RandomIndicationState  extends State<RandomIndication>{
                                         highlightColor: Colors.white,
                                         onTap: () {
                                           tela = true;
-                                          animeList.changePrio(actualAnime);
+                                          animeList.changePrio(
+                                              actualAnime, context);
                                         },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -164,7 +165,8 @@ class _RandomIndicationState  extends State<RandomIndication>{
                                             bool result = value ?? false;
                                             if (result) {
                                               animeListProvider
-                                                  .changeFinalized(actualAnime);
+                                                  .changeFinalized(
+                                                  actualAnime, context);
                                               Navigator.of(context)
                                                   .pushReplacementNamed(
                                                       AppRoutes.HOME);
@@ -172,7 +174,8 @@ class _RandomIndicationState  extends State<RandomIndication>{
                                           });
                                         } else {
                                           animeListProvider
-                                              .changeWacth(actualAnime);
+                                              .changeWacth(
+                                              actualAnime, context);
 
                                         }
                                       },

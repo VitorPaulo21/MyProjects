@@ -47,11 +47,11 @@ class _CreateAnimeScreenState extends State<CreateAnimeScreen> {
         anime["imgUrl"] = ImgUrl;
       }
       AnimeList animeList = Provider.of<AnimeList>(context, listen: false);
-      animeList.addAnime(anime);
+      animeList.addAnime(anime, context);
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       } else {
-        animeList.getAnimes();
+        animeList.getAnimes(context);
         Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
       }
     }

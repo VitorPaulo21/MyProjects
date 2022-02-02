@@ -34,7 +34,7 @@ class LabeledChangebleButton extends StatelessWidget {
             highlightColor: Colors.white,
             onTap: () {
               if (function == labeledButtonFunctions.updatePrio) {
-                animeList.changePrio(actualAnime);
+                animeList.changePrio(actualAnime, context);
               }
               if (function == labeledButtonFunctions.share) {}
               if (function == labeledButtonFunctions.delete) {

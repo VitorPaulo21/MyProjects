@@ -1,11 +1,10 @@
-
-
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/components/home_screen.dart';
 import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/utils/check_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,18 +28,23 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-Future<void> refresh() async {
-    await Provider.of<AnimeList>(context, listen: false).getAnimes();
+
+  Future<void> refresh() async {
+    await Provider.of<AnimeList>(context, listen: false).getAnimes(context);
   }
+
   @override
-  
   Widget build(BuildContext context) {
     DeleteObserver deleteObserver = Provider.of<DeleteObserver>(context);
     return RefreshIndicator(
       onRefresh: () async {
-        await refresh();
-        // Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+        if (await CheckConnection.isConnected()) {
+          await refresh();
+        } else {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.NO_CONNECTION);
+        }
         return Future.value(true);
+
       },
       color: Colors.white,
       child: CustomScrollView(
