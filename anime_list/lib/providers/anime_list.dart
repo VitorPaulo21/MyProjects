@@ -17,73 +17,53 @@ class AnimeList with ChangeNotifier {
   List<Anime> _animeList = [];
   List<Anime> randomAnimes = [];
   String baseUrl = "https://stormapp-80b5f.firebaseio.com";
-  String connectUrl = "/Animes.json";
+  String connectUrl = "/Animes";
   final BuildContext _context;
   bool isLoaded = false;
   AnimeList(BuildContext context) : _context = context {
     getAnimes(context);
   }
-  Future<String> getToken() async {
-    if (await CheckConnection.isConnected()) {
-      return await FirebaseAuth.instance.currentUser?.getIdToken() ?? "";
-    } else {
-      Navigator.of(_context).pushReplacementNamed(AppRoutes.NO_CONNECTION);
-      return "";
-    }
-  }
 
+  //CRUD
   Future<List<Anime>> getAnimes(BuildContext context) async {
+    _animeList.clear();
     isLoaded = false;
-    await get(Uri.parse(baseUrl + connectUrl + "?auth=${await getToken()}"))
-        .then((value) {
-      dynamic decoded = jsonDecode(
-        value.body,
-      );
-      final loadedData =
-          decoded.runtimeType == Null ? {} : decoded as Map<String, dynamic>;
-      loadedData.forEach((key, value) {
-        Map<String, dynamic> entry =
-            (value as LinkedHashMap<String, dynamic>).cast();
-        _animeList.add(Anime(
-          id: entry["id"].runtimeType == Null ? "" : entry["id"],
-          genero: (entry["genero"] as List<dynamic>).cast<String>(),
-          title: entry["title"].runtimeType == Null ? "" : entry["title"],
-          description: entry["description"].runtimeType == Null
-              ? ""
-              : entry["description"],
-          imageUrl:
-              entry["imageUrl"].runtimeType == Null ? "" : entry["imageUrl"],
-          isPrio: entry["isPrio"],
-          watched: entry["watched"],
-          watching: entry["watching"],
-        ));
+    try {
+      await get(Uri.parse(
+              "$baseUrl$connectUrl/$userID.json?auth=${await getToken()}"))
+          .then((value) {
+        dynamic decoded = jsonDecode(
+          value.body,
+        );
+        final loadedData =
+            decoded.runtimeType == Null ? {} : decoded as Map<String, dynamic>;
+        loadedData.forEach((key, value) {
+          Map<String, dynamic> entry =
+              (value as LinkedHashMap<String, dynamic>).cast();
+          _animeList.add(Anime(
+            id: entry["id"].runtimeType == Null ? "" : entry["id"],
+            genero: entry["genero"].runtimeType == Null
+                ? []
+                : (entry["genero"] as List<dynamic>).cast<String>(),
+            title: entry["title"].runtimeType == Null ? "" : entry["title"],
+            description: entry["description"].runtimeType == Null
+                ? ""
+                : entry["description"],
+            imageUrl:
+                entry["imageUrl"].runtimeType == Null ? "" : entry["imageUrl"],
+            isPrio: entry["isPrio"],
+            watched: entry["watched"],
+            watching: entry["watching"],
+          ));
+        });
       });
-    });
+    } catch (_) {
+      
+    }
     getRandomAnimes();
     isLoaded = true;
     notifyListeners();
     return _animeList;
-  }
-
-  void getRandomAnimes() {
-    randomAnimes.clear();
-    if (_animeList.isEmpty) {
-      randomAnimes = [];
-      notifyListeners();
-      return;
-    }
-    List<Anime> animeList =
-        _animeList.where((anime) => !anime.watched).toList();
-    animeList.shuffle();
-    if (animeList.length >= 3) {
-      randomAnimes = [animeList[0], animeList[1], animeList[2]];
-    } else if (animeList.length > 0) {
-      for (int i = 0; i < animeList.length; i++) {
-        randomAnimes.add(animeList[i]);
-      }
-    } else {
-      randomAnimes = [];
-    }
   }
 
   void changeFinalized(Anime anime, BuildContext context) async {
@@ -95,7 +75,7 @@ class AnimeList with ChangeNotifier {
       notifyListeners();
       patch(
           Uri.parse(
-              "$baseUrl/Animes/${animeFinal.id}.json?auth=${await getToken()}"),
+              "$baseUrl/Animes/$userID/${animeFinal.id}.json?auth=${await getToken()}"),
           body: jsonEncode({
             "watched": animeFinal.watched,
             "watching": animeFinal.watching,
@@ -103,55 +83,6 @@ class AnimeList with ChangeNotifier {
     } else {
       TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
     }
-  }
-
-  void addAnime(Map<String, Object> anime, BuildContext context) async {
-    if (await CheckConnection.isConnected()) {
-      if (anime.containsKey("id")) {
-        updateAnime(anime, context);
-        getRandomAnimes();
-        return;
-      }
-      Anime newAnime = mapToAnime(anime);
-      _animeList.add(newAnime);
-      notifyListeners();
-      String token = "?auth=${await getToken()}";
-      post(Uri.parse(baseUrl + connectUrl + token),
-          body: jsonEncode({
-            "id": newAnime.id,
-            "title": newAnime.title,
-            "description": newAnime.description,
-            "genero": newAnime.genero,
-            "imageUrl": newAnime.imageUrl,
-            "watched": newAnime.watched,
-            "watching": newAnime.watching,
-            "isPrio": newAnime.isPrio,
-          })).then((response) {
-        String id = jsonDecode(response.body)["name"];
-
-        patch(Uri.parse("$baseUrl/Animes/$id.json$token"),
-            body: jsonEncode({"id": id}));
-      });
-      getRandomAnimes();
-    } else {
-      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
-    }
-  }
-
-  Anime mapToAnime(Map<String, Object> anime) {
-    Anime newAnime = Anime(
-      id: anime.containsKey("id")
-          ? anime["id"].toString()
-          : Random().nextDouble().toString(),
-      title: anime["title"].toString(),
-      genero: anime["genders"] as List<String>,
-      description: anime.containsKey("desc") ? anime["desc"].toString() : "",
-      isPrio: anime.containsKey("prio") ? anime["prio"] as bool : false,
-    );
-    if (anime.containsKey("imgUrl")) {
-      newAnime.setImageUrl(anime["imgUrl"].toString());
-    }
-    return newAnime;
   }
 
   void updateAnime(Map<String, Object> anime, BuildContext context) async {
@@ -181,12 +112,164 @@ class AnimeList with ChangeNotifier {
             animeUpdate);
         notifyListeners();
         String token = "?auth=${await getToken()}";
-        put(Uri.parse("$baseUrl/Animes/${animeUpdate.id}.json$token"),
+        put(
+            Uri.parse(
+                "$baseUrl$connectUrl/$userID/${animeUpdate.id}.json$token"),
             body: jsonEncode(animeUpdate.getMap()));
       }
     } else {
       TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
     }
+  }
+
+  void addAnime(Map<String, Object> anime, BuildContext context) async {
+    if (await CheckConnection.isConnected()) {
+      if (anime.containsKey("id")) {
+        updateAnime(anime, context);
+        getRandomAnimes();
+        return;
+      }
+      Anime newAnime = mapToAnime(anime);
+      _animeList.add(newAnime);
+      notifyListeners();
+      String token = "?auth=${await getToken()}";
+      post(Uri.parse('$baseUrl$connectUrl/$userID.json$token'),
+          body: jsonEncode({
+            "id": newAnime.id,
+            "title": newAnime.title,
+            "description": newAnime.description,
+            "genero": newAnime.genero,
+            "imageUrl": newAnime.imageUrl,
+            "watched": newAnime.watched,
+            "watching": newAnime.watching,
+            "isPrio": newAnime.isPrio,
+          })).then((response) {
+        String id = jsonDecode(response.body)["name"];
+
+        patch(Uri.parse("$baseUrl$connectUrl/$userID/$id.json$token"),
+            body: jsonEncode({"id": id}));
+      });
+      getRandomAnimes();
+    } else {
+      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
+    }
+  }
+
+  void changeWacth(Anime anime, BuildContext context) async {
+    if (await CheckConnection.isConnected()) {
+      Anime updatedAnime = findFirst(anime);
+      updatedAnime.watching = !updatedAnime.watching;
+      updatedAnime.watched = false;
+      notifyListeners();
+      String token = "?auth=${await getToken()}";
+      patch(
+          Uri.parse(
+              "$baseUrl$connectUrl/$userID/${updatedAnime.id}.json$token"),
+          body: jsonEncode({
+            "watched": updatedAnime.watched,
+            "watching": updatedAnime.watching,
+          }));
+    } else {
+      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
+    }
+  }
+
+  void changePrio(Anime anime, BuildContext context) async {
+    if (await CheckConnection.isConnected()) {
+      Anime updatedAnime = findFirst(anime);
+      updatedAnime.isPrio = !updatedAnime.isPrio;
+      notifyListeners();
+      String token = "?auth=${await getToken()}";
+      patch(
+        Uri.parse("$baseUrl$connectUrl/$userID/${updatedAnime.id}.json$token"),
+        body: jsonEncode(
+          {
+            "isPrio": updatedAnime.isPrio,
+          },
+        ),
+      );
+    } else {
+      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
+    }
+  }
+
+  void deleteAnime(Anime anime, BuildContext context) async {
+    if (await CheckConnection.isConnected()) {
+      String id = "";
+      _animeList.removeWhere((element) {
+        id = element.id;
+        return element == anime;
+      });
+      notifyListeners();
+      String token = "?auth=${await getToken()}";
+      delete(
+        Uri.parse("$baseUrl$connectUrl/$userID/${anime.id}.json$token"),
+      );
+      getRandomAnimes();
+    } else {
+      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
+    }
+  }
+
+  //FUNCTIONS
+  Future<String> getToken() async {
+    if (await CheckConnection.isConnected()) {
+      return await FirebaseAuth.instance.currentUser?.getIdToken() ?? "";
+    } else {
+      Navigator.of(_context).pushReplacementNamed(AppRoutes.NO_CONNECTION);
+      return "";
+    }
+  }
+
+  void getRandomAnimes() {
+    randomAnimes.clear();
+    if (_animeList.isEmpty) {
+      randomAnimes = [];
+      notifyListeners();
+      return;
+    }
+    List<Anime> animeList =
+        _animeList.where((anime) => !anime.watched).toList();
+    animeList.shuffle();
+    if (animeList.length >= 3) {
+      randomAnimes = [animeList[0], animeList[1], animeList[2]];
+    } else if (animeList.length > 0) {
+      for (int i = 0; i < animeList.length; i++) {
+        randomAnimes.add(animeList[i]);
+      }
+    } else {
+      randomAnimes = [];
+    }
+  }
+
+  Anime mapToAnime(Map<String, Object> anime) {
+    Anime newAnime = Anime(
+      id: anime.containsKey("id")
+          ? anime["id"].toString()
+          : Random().nextDouble().toString(),
+      title: anime["title"].toString(),
+      genero: anime["genders"] as List<String>,
+      description: anime.containsKey("desc") ? anime["desc"].toString() : "",
+      isPrio: anime.containsKey("prio") ? anime["prio"] as bool : false,
+    );
+    if (anime.containsKey("imgUrl")) {
+      newAnime.setImageUrl(anime["imgUrl"].toString());
+    }
+    return newAnime;
+  }
+
+  Anime findFirst(Anime anime) {
+    return _animeList.firstWhere((element) => element.id == anime.id);
+  }
+
+  Anime? findAnimeById(String id) {
+    return _animeList.firstWhere((element) => element.id == id, orElse: null);
+  }
+
+  //GETTERS AND SETTERS
+
+  String get userID {
+    return FirebaseAuth.instance.currentUser?.uid ?? "";
   }
 
   List<Anime> get animeList {
@@ -214,68 +297,6 @@ class AnimeList with ChangeNotifier {
 
   List<Anime> get prioAnimes {
     return _animeList.where((anime) => anime.isPrio && !anime.watched).toList();
-  }
-
-  void changeWacth(Anime anime, BuildContext context) async {
-    if (await CheckConnection.isConnected()) {
-      Anime updatedAnime = findFirst(anime);
-      updatedAnime.watching = !updatedAnime.watching;
-      updatedAnime.watched = false;
-      notifyListeners();
-      String token = "?auth=${await getToken()}";
-      patch(Uri.parse("$baseUrl/Animes/${updatedAnime.id}.json$token"),
-          body: jsonEncode({
-            "watched": updatedAnime.watched,
-            "watching": updatedAnime.watching,
-          }));
-    } else {
-      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
-    }
-  }
-
-  void changePrio(Anime anime, BuildContext context) async {
-    if (await CheckConnection.isConnected()) {
-      Anime updatedAnime = findFirst(anime);
-      updatedAnime.isPrio = !updatedAnime.isPrio;
-      notifyListeners();
-      String token = "?auth=${await getToken()}";
-      patch(
-        Uri.parse("$baseUrl/Animes/${updatedAnime.id}.json$token"),
-        body: jsonEncode(
-          {
-            "isPrio": updatedAnime.isPrio,
-          },
-        ),
-      );
-    } else {
-      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
-    }
-  }
-
-  Anime findFirst(Anime anime) {
-    return _animeList.firstWhere((element) => element.id == anime.id);
-  }
-
-  Anime? findAnimeById(String id) {
-    return _animeList.firstWhere((element) => element.id == id, orElse: null);
-  }
-
-  void deleteAnime(Anime anime, BuildContext context) async {
-    if (await CheckConnection.isConnected()) {
-      String id = "";
-      _animeList.removeWhere((element) {
-        id = element.id;
-        return element == anime;
-      });
-      notifyListeners();
-      String token = "?auth=${await getToken()}";
-      delete(
-        Uri.parse("$baseUrl/Animes/${anime.id}.json$token"),
-      );
-      getRandomAnimes();
-    } else {
-      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
-    }
   }
 
   List<Anime> getListWithFilters(

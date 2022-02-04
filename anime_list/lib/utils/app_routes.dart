@@ -6,4 +6,5 @@ class AppRoutes {
   static const String ANIME_LIST = "/animeList";
   static const String ANIME_DETAILS = "/animeDetails";
   static const String NO_CONNECTION = "/noConnection";
+  static const String USER_DETAILS_EDIT = "/userDetailsEdit";
 }

@@ -5,6 +5,7 @@ import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/delete_observer.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/check_connection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +36,7 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
 
   @override
   Widget build(BuildContext context) {
+    
     DeleteObserver deleteObserver = Provider.of<DeleteObserver>(context);
     return RefreshIndicator(
       onRefresh: () async {
@@ -59,13 +61,9 @@ class _HomeScreenScroolState extends State<HomeScreenScrool> {
               centerTitle: true,
               title: Text("My Animes"),
             ),
-            leading: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset("lib/assets/profile.png")),
-            ),
+
             actions: [
+              IconButton(onPressed: (){}, icon: const Icon(Icons.notifications)),
               PopupMenuButton<ListTile>(
                   icon: Icon(Icons.search),
                   itemBuilder: (ctx) => <PopupMenuEntry<ListTile>>[

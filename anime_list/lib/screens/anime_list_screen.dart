@@ -1,4 +1,5 @@
 import 'package:anime_list/components/animes_screen.dart';
+import 'package:anime_list/components/app_drawer.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
   Widget build(BuildContext context) {
     AnimeList animeList = Provider.of<AnimeList>(context, listen: false);
     return Scaffold(
-     
+      drawer: AppDrawer(),
       floatingActionButton: _currentIndex == 0 ? FloatingActionButton(
         
               child: Icon(Icons.add, color: Colors.white),

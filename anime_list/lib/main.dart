@@ -4,11 +4,13 @@ import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/auth.dart';
 import 'package:anime_list/providers/delete_observer.dart';
+import 'package:anime_list/providers/user_profile_provider.dart';
 import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/auth_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
 import 'package:anime_list/screens/no_connection_screen.dart';
+import 'package:anime_list/screens/user_details_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/screens/initial_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,7 +39,10 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<Auth>(
           create: (_) => Auth(),
-        )
+        ),
+        ChangeNotifierProvider<UserProfileProvider>(
+          create: (_) => UserProfileProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -61,6 +66,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.ANIME_LIST: (_) => AnimesScreen(),
           AppRoutes.ANIME_DETAILS: (_) => AnimeDetailsScreen(),
           AppRoutes.NO_CONNECTION: (_) => NoConnectionScreen(),
+          AppRoutes.USER_DETAILS_EDIT: (_) => UserDetailsScreen(),
         },
       ),
     );

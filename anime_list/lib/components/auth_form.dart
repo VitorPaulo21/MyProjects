@@ -1,5 +1,8 @@
 import 'package:anime_list/components/input_decoration_white.dart';
+import 'package:anime_list/models/user_profile.dart';
+import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/auth.dart';
+import 'package:anime_list/providers/user_profile_provider.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/check_connection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +43,7 @@ class _AuthFormState extends State<AuthForm> {
         try {
           bool connected = await CheckConnection.isConnected();
           if (connected) {
-          await auth.forgotPassword(recuperationEmail);
+            await auth.forgotPassword(recuperationEmail);
           } else {
             showSnackbar(context, text: "Sem conexão a Internet");
             return;
@@ -111,14 +114,29 @@ class _AuthFormState extends State<AuthForm> {
         });
         bool connected = await CheckConnection.isConnected();
         if (connected) {
-        await auth.Autenticate(loginStyle, authData);
-          
+          await auth.Autenticate(loginStyle, authData);
         } else {
           Navigator.of(context).pushReplacementNamed(AppRoutes.NO_CONNECTION);
           return;
         }
         if (FirebaseAuth.instance.currentUser != null) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+          if (loginStyle == LoginStyle.SIGNUP) {
+            await FirebaseAuth.instance.currentUser?.updateDisplayName("");
+            await FirebaseAuth.instance.currentUser?.updatePhotoURL(
+                "https://firebasestorage.googleapis.com/v0/b/stormapp-80b5f.appspot.com/o/ImageAnime%2FAppImages%2FPikPng.com_luffy-png_1127171.png?alt=media&token=e25e4ffc-abca-48bf-ab7c-e7967d77016b");
+            Navigator.of(context)
+                .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
+          } else {
+            if (FirebaseAuth.instance.currentUser?.displayName?.isEmpty ??
+                true) {
+              Navigator.of(context)
+                  .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
+            } else {
+              await Provider.of<AnimeList>(context, listen: false)
+                  .getAnimes(context);
+              Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+            }
+          }
         } else {
           showDialog(
               context: context,
@@ -236,8 +254,9 @@ class _AuthFormState extends State<AuthForm> {
               width: MediaQuery.of(context).size.width * 0.7,
               child: isLoading
                   ? const Center(
-                    
-                      child: CircularProgressIndicator(color: Colors.white,),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
                     )
                   : Form(
                       key: formKey,

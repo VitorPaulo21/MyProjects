@@ -1,5 +1,7 @@
 import 'package:anime_list/components/auth_form.dart';
+import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/providers/auth.dart';
+import 'package:anime_list/providers/user_profile_provider.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/check_connection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,7 +32,20 @@ class InitialScreen extends StatelessWidget {
             Navigator.of(context).pushReplacementNamed(AppRoutes.AUTH);
             return;
           }
-          Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+          await Provider.of<UserProfileProvider>(context, listen: false)
+              .setUserProfile();
+          if (Provider.of<UserProfileProvider>(context, listen: false)
+                  .userProfile ==
+              null) {
+            Navigator.of(context)
+                .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
+          } else if (!Provider.of<UserProfileProvider>(context, listen: false)
+              .isvalidUser()) {
+            Navigator.of(context)
+                .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
+          } else {
+            Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+          }
         } else {
           Navigator.of(context).pushReplacementNamed(AppRoutes.AUTH);
         }
