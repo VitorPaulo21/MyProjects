@@ -24,6 +24,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   String defaultImage =
       "https://firebasestorage.googleapis.com/v0/b/stormapp-80b5f.appspot.com/o/ImageAnime%2FAppImages%2FPikPng.com_luffy-png_1127171.png?alt=media&token=e25e4ffc-abca-48bf-ab7c-e7967d77016b";
   bool validUrl = true;
+  bool userNameAlreadExists = true;
   String currentUrl = "";
   GlobalKey<FormState> data = GlobalKey<FormState>();
   GlobalKey buttonKey = GlobalKey<State<ElevatedButton>>();
@@ -69,12 +70,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       Navigator.of(context).pushReplacementNamed(AppRoutes.NO_CONNECTION);
       return;
     }
-    bool isValid = data.currentState?.validate() ?? false;
     setState(() {
       isLoading = true;
     });
+    userNameAlreadExists =
+        await getProfileProvider().isUserNameExist(nameEditingControler.text);
+    bool isValid = data.currentState?.validate() ?? false;
     if (isValid) {
-      getProfileProvider().addUser(UserProfile(
+      await getProfileProvider().addUser(UserProfile(
           name: nameEditingControler.text, profileImageUrl: getImageUrl()));
       Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
     }
@@ -198,7 +201,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                   child: TextFormField(
                     onFieldSubmitted: (txt) => submitForm(),
                     controller: nameEditingControler,
-                    maxLength: 20,
+                    maxLength: 14,
                     cursorColor: Colors.white,
                     decoration: const InputDecoration(
                         disabledBorder: UnderlineInputBorder(
@@ -224,6 +227,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                       }
                       if ((txt ?? "").length < 5) {
                         return "Necessita de no minimo 5 letras";
+                      }
+                      if (userNameAlreadExists) {
+                        return "O nome de usuario já existe";
                       }
                     },
                   ),

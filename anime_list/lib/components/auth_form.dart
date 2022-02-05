@@ -120,15 +120,14 @@ class _AuthFormState extends State<AuthForm> {
           return;
         }
         if (FirebaseAuth.instance.currentUser != null) {
+          await Provider.of<UserProfileProvider>(context, listen: false)
+              .setUserProfile();
           if (loginStyle == LoginStyle.SIGNUP) {
-            await FirebaseAuth.instance.currentUser?.updateDisplayName("");
-            await FirebaseAuth.instance.currentUser?.updatePhotoURL(
-                "https://firebasestorage.googleapis.com/v0/b/stormapp-80b5f.appspot.com/o/ImageAnime%2FAppImages%2FPikPng.com_luffy-png_1127171.png?alt=media&token=e25e4ffc-abca-48bf-ab7c-e7967d77016b");
             Navigator.of(context)
                 .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
           } else {
-            if (FirebaseAuth.instance.currentUser?.displayName?.isEmpty ??
-                true) {
+            if (!Provider.of<UserProfileProvider>(context, listen: false)
+                .isvalidUser()) {
               Navigator.of(context)
                   .pushReplacementNamed(AppRoutes.USER_DETAILS_EDIT);
             } else {

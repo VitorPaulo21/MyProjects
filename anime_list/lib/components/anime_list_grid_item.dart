@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 
 class AnimeListGridItem extends StatelessWidget {
   final Anime anime;
-  const AnimeListGridItem(this.anime, {Key? key}) : super(key: key);
+  final FocusNode? fatherNode;
+  const AnimeListGridItem(this.anime, {Key? key, FocusNode? focusNode})
+      : fatherNode = focusNode,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +32,25 @@ class AnimeListGridItem extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  if (fatherNode != null) {
+                    if (fatherNode!.hasFocus) {
+                      fatherNode!.unfocus();
+                      return;
+                    }
+                  }
                   showModalBottomSheet(
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(15),
                               topRight: Radius.circular(15))),
                       context: context,
-                      builder: (ctx) => InfoBotomSheet(anime));
+                      builder: (ctx) => InfoBotomSheet(anime)).then((value) {
+                    if (fatherNode != null) {
+                      if (fatherNode!.hasFocus) {
+                        fatherNode!.unfocus();
+                      }
+                    }
+                  });
                 },
                 child: SizedBox(
                   height: constraints.maxHeight,

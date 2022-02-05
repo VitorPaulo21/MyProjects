@@ -7,4 +7,5 @@ class AppRoutes {
   static const String ANIME_DETAILS = "/animeDetails";
   static const String NO_CONNECTION = "/noConnection";
   static const String USER_DETAILS_EDIT = "/userDetailsEdit";
+  static const String PROFILE_SCREEN = "/profileScreen";
 }

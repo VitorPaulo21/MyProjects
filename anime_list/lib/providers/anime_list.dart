@@ -210,6 +210,20 @@ class AnimeList with ChangeNotifier {
       TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
     }
   }
+  void deleteAllAnimes(String userId, BuildContext? context) async {
+    if (await CheckConnection.isConnected()) {
+      String id = "";
+      String token = "?auth=${await getToken()}";
+      delete(
+        Uri.parse("$baseUrl$connectUrl/$userID.json$token"),
+      );
+    } else {
+      if (context == null) {
+        return;
+      }
+      TextSnackbar.show(context, text: "Sem Conexão com a Internet!");
+    }
+  }
 
   //FUNCTIONS
   Future<String> getToken() async {

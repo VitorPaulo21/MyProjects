@@ -22,7 +22,13 @@ class _AnimesScreenState extends State<AnimesScreen> {
   late AnimeList animeList;
   String queryData = "";
   TextEditingController searchController = TextEditingController();
+  FocusNode queryFocusNode = FocusNode();
 
+  @override
+  void dispose() {
+    queryFocusNode.removeListener(() {});
+    super.dispose();
+  }
   @override
   void didChangeDependencies() {
     Object? params = ModalRoute.of(context)?.settings.arguments;
@@ -55,8 +61,14 @@ class _AnimesScreenState extends State<AnimesScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
+        if (queryFocusNode.hasFocus) {
+          queryFocusNode.unfocus();
+          return Future<bool>.value(false);
+        } else {
         Navigator.of(context).pushNamed(AppRoutes.HOME);
         return Future<bool>.value(true);
+
+        }
       },
       child: Scaffold(
           appBar: AppBar(
@@ -145,6 +157,7 @@ class _AnimesScreenState extends State<AnimesScreen> {
                             padding: const EdgeInsets.only(left: 8),
                             width: constraints.maxWidth * 0.9,
                             child: TextField(
+                              focusNode: queryFocusNode,
                               controller: searchController,
                               textInputAction: TextInputAction.search,
                               decoration: DecorationWithLabel("Pesquisar Anime")
@@ -172,22 +185,29 @@ class _AnimesScreenState extends State<AnimesScreen> {
                     ),
                   ),
                   animes.length > 0
-                      ? Container(
-                          height: constraints.maxHeight * 0.87,
-                          child: GridView.builder(
-                              padding: const EdgeInsets.all(10),
-                              itemCount: animes.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                      childAspectRatio: 9 / 12,
-                                      crossAxisSpacing: 15,
-                                      mainAxisSpacing: 15,
-                                      crossAxisCount: 3),
-                              itemBuilder: (ctx, index) {
-                                // return RowAnimeListItem(animes[index]);
-                                return AnimeListGridItem(animes[index]);
-                              }),
-                        )
+                      ? GestureDetector(
+                        onTap: (){
+                          if (queryFocusNode.hasFocus) {
+                            queryFocusNode.unfocus();
+                          }
+                        },
+                        child: Container(
+                            height: constraints.maxHeight * 0.87,
+                            child: GridView.builder(
+                                padding: const EdgeInsets.all(10),
+                                itemCount: animes.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                        childAspectRatio: 9 / 12,
+                                        crossAxisSpacing: 15,
+                                        mainAxisSpacing: 15,
+                                        crossAxisCount: 3),
+                                itemBuilder: (ctx, index) {
+                                  // return RowAnimeListItem(animes[index]);
+                                  return AnimeListGridItem(animes[index], focusNode : queryFocusNode);
+                                }),
+                          ),
+                      )
                       : NotFindScreen(
                           message: animeList.animeList.length <= 0
                               ? null

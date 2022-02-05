@@ -1,5 +1,3 @@
-
-
 import 'package:anime_list/components/animes_screen.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/auth.dart';
@@ -10,6 +8,7 @@ import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/auth_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
 import 'package:anime_list/screens/no_connection_screen.dart';
+import 'package:anime_list/screens/profile_screen.dart';
 import 'package:anime_list/screens/user_details_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/screens/initial_screen.dart';
@@ -37,11 +36,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<DeleteObserver>(
           create: (_) => DeleteObserver(),
         ),
-        ChangeNotifierProvider<Auth>(
-          create: (_) => Auth(),
-        ),
         ChangeNotifierProvider<UserProfileProvider>(
           create: (_) => UserProfileProvider(),
+        ),
+        ChangeNotifierProxyProvider<UserProfileProvider, Auth>(
+          create: (_) => Auth(null),
+          update: (ctx, profileProvider, previous) {
+            return Auth(profileProvider);
+          },
         ),
       ],
       child: MaterialApp(
@@ -67,6 +69,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.ANIME_DETAILS: (_) => AnimeDetailsScreen(),
           AppRoutes.NO_CONNECTION: (_) => NoConnectionScreen(),
           AppRoutes.USER_DETAILS_EDIT: (_) => UserDetailsScreen(),
+          AppRoutes.PROFILE_SCREEN: (_) => ProfileScreen(),
         },
       ),
     );

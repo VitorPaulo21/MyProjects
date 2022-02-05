@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:anime_list/components/auth_form.dart';
+import 'package:anime_list/providers/user_profile_provider.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/check_connection.dart';
 import 'package:encrypt/encrypt.dart' as a;
@@ -12,8 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
   String baseUrl = "https://identitytoolkit.googleapis.com/v1/accounts:";
-
-  Auth() {
+  final UserProfileProvider? profileProvider;
+  Auth(this.profileProvider) {
     FirebaseAuth auth = FirebaseAuth.instance;
   }
   Future<void> Autenticate(
@@ -62,6 +63,7 @@ class Auth with ChangeNotifier {
 
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
+    profileProvider!.userProfile = null;
     SharedPreferences sharedData = await SharedPreferences.getInstance();
     sharedData.setString("email", "");
     sharedData.setString("password", "");

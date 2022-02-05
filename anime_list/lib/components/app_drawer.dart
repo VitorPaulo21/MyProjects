@@ -13,7 +13,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     UserProfileProvider profileProvider =
-        Provider.of<UserProfileProvider>(context);
+        Provider.of<UserProfileProvider>(context, listen: false);
     return Drawer(
       child: Scaffold(
         appBar: AppBar(
@@ -31,20 +31,20 @@ class AppDrawer extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (ctx) {
-                          return const AlertDialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            contentPadding: EdgeInsets.all(0),
-                            content: ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                child: UserDetailsScreen()),
-                          );
-                        });
+                    // showDialog(
+                    //     context: context,
+                    //     builder: (ctx) {
+                    //       return const AlertDialog(
+                    //         shape: RoundedRectangleBorder(
+                    //             borderRadius:
+                    //                 BorderRadius.all(Radius.circular(20))),
+                    //         contentPadding: EdgeInsets.all(0),
+                    //         content: ClipRRect(
+                    //             borderRadius:
+                    //                 BorderRadius.all(Radius.circular(20)),
+                    //             child: UserDetailsScreen()),
+                    //       );
+                    //     });
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -92,9 +92,17 @@ class AppDrawer extends StatelessWidget {
                     "Home",
                   ),
                 ),
-                const ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text("Perfil"),
+                ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text("Perfil"),
+                  textColor: ModalRoute.of(context)?.settings.name ==
+                          AppRoutes.PROFILE_SCREEN
+                      ? Colors.red
+                      : Colors.white,
+                  onTap: () => Navigator.of(context).pushReplacementNamed(
+                    AppRoutes.PROFILE_SCREEN,
+                    arguments: profileProvider.userProfile,
+                  ),
                 ),
                 const ListTile(
                   enabled: false,
