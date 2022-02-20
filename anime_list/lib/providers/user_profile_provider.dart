@@ -12,7 +12,7 @@ class UserProfileProvider with ChangeNotifier {
   String _pasteUrl = "User-Profiles";
   UserProfile? userProfile;
 
-  String get _userId {
+  String get userId {
     return FirebaseAuth.instance.currentUser?.uid ?? "";
   }
 
@@ -51,12 +51,12 @@ class UserProfileProvider with ChangeNotifier {
     }
     if (await currentUser == null) {
       await put(
-        Uri.parse("$_baseUrl/$_pasteUrl/$_userId.json${await _authToken}"),
+        Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"),
         body: jsonEncode(
           {
             "name": user.name,
             "profileImageUrl": user.profileImageUrl,
-            "id": _userId,
+            "id": userId,
           },
         ),
       );
@@ -64,7 +64,7 @@ class UserProfileProvider with ChangeNotifier {
         Uri.parse(
             "$_baseUrl/$_pasteUrl/UserNames/${user.name}.json${await _authToken}"),
         body: jsonEncode(
-          _userId,
+          userId,
         ),
       );
     } else {
@@ -79,25 +79,25 @@ class UserProfileProvider with ChangeNotifier {
       return;
     }
     await patch(
-      Uri.parse("$_baseUrl/$_pasteUrl/$_userId.json${await _authToken}"),
+      Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"),
       body: jsonEncode(
         {
           "name": user.name,
           "profileImageUrl": user.profileImageUrl,
-          "id": _userId,
+          "id": userId,
         },
       ),
     );
     await put(
       Uri.parse(
           "$_baseUrl/$_pasteUrl/UserNames/${user.name}.json${await _authToken}"),
-      body: jsonEncode(_userId),
+      body: jsonEncode(userId),
     );
   }
 
   void deleteUser(UserProfile user) async {
     await delete(
-      Uri.parse("$_baseUrl/$_pasteUrl/$_userId.json${await _authToken}"),
+      Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"),
     );
     await delete(
       Uri.parse(
@@ -125,7 +125,7 @@ class UserProfileProvider with ChangeNotifier {
   Future<UserProfile?> get currentUser async {
     late UserProfile? user;
     await get(
-            Uri.parse("$_baseUrl/$_pasteUrl/$_userId.json${await _authToken}"))
+            Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"))
         .then(
       (value) {
         if (value.body == "null") {
@@ -136,7 +136,7 @@ class UserProfileProvider with ChangeNotifier {
           user = UserProfile(
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
-            id: _userId,
+            id: userId,
           );
         }
       },

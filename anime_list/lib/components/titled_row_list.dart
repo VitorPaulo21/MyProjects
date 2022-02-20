@@ -40,10 +40,7 @@ class TitledRowList extends StatelessWidget {
           padding: const EdgeInsets.only(top: 15, right: 10, left: 10,),
           child: InkWell(
             
-            onTap: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.ANIME_LIST,
-                  arguments: {"listTipe": listTipe});
-            },
+            onTap: onTap,
             child: Row(
               children: [
                 Text(
