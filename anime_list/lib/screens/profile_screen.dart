@@ -3,25 +3,57 @@ import 'package:anime_list/components/app_drawer.dart';
 import 'package:anime_list/components/home_screen.dart';
 import 'package:anime_list/components/row_anime_list.dart';
 import 'package:anime_list/components/titled_row_list.dart';
+import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/models/user_profile.dart';
+import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/user_profile_provider.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  List<Anime> userListAnime = [];
+  bool isLoading = true;
+
+  getAnimes(UserProfile userProfile) async {
+    if (userListAnime.isNotEmpty) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    userListAnime = await Provider.of<AnimeList>(context, listen: false)
+        .getAnimeListFromUserProfile(userProfile);
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     UserProfile userProfile =
         ModalRoute.of(context)?.settings.arguments as UserProfile;
-    bool isSelfUser = userProfile.id == (Provider.of<UserProfileProvider>(context).userProfile?.id ?? false);
-    return Scaffold(
+    bool isSelfUser = userProfile.id ==
+        (Provider.of<UserProfileProvider>(context).userProfile?.id ?? false);
+    getAnimes(userProfile);
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          )
+        : Scaffold(
       backgroundColor: Colors.black,
       drawer: AppDrawer(),
-      body: CustomScrollView(
-        
+            body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -53,12 +85,17 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () {},
-                        icon:isSelfUser ? const Icon(Icons.favorite, color: Colors.red,) : const Icon(Icons.favorite_border),
+                              icon: isSelfUser
+                                  ? const Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                    )
+                                  : const Icon(Icons.favorite_border),
                       ),
                       ElevatedButton(
                         onPressed: () {},
                         child: Text(
-                          isSelfUser? "Editar" :"Adicionar",
+                                isSelfUser ? "Editar" : "Adicionar",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSecondary,
                           ),
@@ -69,7 +106,9 @@ class ProfileScreen extends StatelessWidget {
                                 Radius.circular(92),
                               ),
                             ),
-                            primary:isSelfUser? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+                                  primary: isSelfUser
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.secondary,
                             onPrimary: Colors.white),
                       ),
                       IconButton(
@@ -93,30 +132,88 @@ class ProfileScreen extends StatelessWidget {
                   topRight: Radius.circular(30),
                 ),
                 child: Container(
-                  color: Colors.grey[850],
-
+                        color: Colors.grey[850],
                   child: Column(
-                    children: const [
+                          children: [
                       TitledRowList(
                         title: "Assistindo",
                         hasArrow: true,
                         listTipe: ListTipe.WATCHING,
+                              onTap: () {
+                                Provider.of<AnimeList>(context, listen: false)
+                                    .getAnimeListFromUserProfile(userProfile)
+                                    .then((userList) {
+                                  Navigator.of(context).pushNamed(
+                                      AppRoutes.ANIME_LIST,
+                                      arguments: {
+                                        "listTipe": ListTipe.WATCHING,
+                                        "userList": AnimeList(context,
+                                            userList: userList)
+                                      });
+                                });
+                              },
                       ),
                       TitledRowList(
                         title: "Prioridades",
                         hasArrow: true,
                         listTipe: ListTipe.PRIO,
+                              onTap: () {
+                                Provider.of<AnimeList>(context, listen: false)
+                                    .getAnimeListFromUserProfile(userProfile)
+                                    .then((userList) {
+                                  Navigator.of(context).pushNamed(
+                                      AppRoutes.ANIME_LIST,
+                                      arguments: {
+                                        "listTipe": ListTipe.PRIO,
+                                        "userList": AnimeList(context,
+                                            userList: userList)
+                                      });
+                                });
+                              },
                       ),
                       TitledRowList(
                         title: "Para Assistir",
                         hasArrow: true,
                         listTipe: ListTipe.NORMAL,
+                              userList:
+                                  AnimeList(context, userList: userListAnime),
+                              onTap: () {
+                                Provider.of<AnimeList>(context, listen: false)
+                                    .getAnimeListFromUserProfile(userProfile)
+                                    .then((userList) {
+                                  Navigator.of(context).pushNamed(
+                                      AppRoutes.ANIME_LIST,
+                                      arguments: {
+                                        "listTipe": ListTipe.NORMAL,
+                                        "userList": AnimeList(context,
+                                            userList: userList)
+                                      });
+                                });
+                              },
                       ),
                       TitledRowList(
                         title: "Concluidos",
                         hasArrow: true,
                         listTipe: ListTipe.FINISHED,
+                              userList:
+                                  AnimeList(context, userList: userListAnime),
+                              onTap: () {
+                                Provider.of<AnimeList>(context, listen: false)
+                                    .getAnimeListFromUserProfile(userProfile)
+                                    .then((userList) {
+                                  Navigator.of(context).pushNamed(
+                                      AppRoutes.ANIME_LIST,
+                                      arguments: {
+                                        "listTipe": ListTipe.FINISHED,
+                                        "userList": AnimeList(context,
+                                            userList: userList)
+                                      });
+                                });
+                              },
                       ),
+                            SizedBox(
+                              height: 20,
+                            )
                     ],
                   ),
                 )),

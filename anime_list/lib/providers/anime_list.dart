@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:anime_list/components/show_text_snackbar.dart';
 import 'package:anime_list/models/anime.dart';
+import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/check_connection.dart';
 import 'package:anime_list/utils/list_tipe.dart';
@@ -20,8 +21,13 @@ class AnimeList with ChangeNotifier {
   String connectUrl = "/Animes";
   final BuildContext _context;
   bool isLoaded = false;
-  AnimeList(BuildContext context) : _context = context {
+  AnimeList(BuildContext context,{List<Anime>? userList}) : _context = context {
+    if (userList == null) {
     getAnimes(context);
+      
+    } else {
+      _animeList = userList;
+    }
   }
 
   //CRUD
@@ -226,6 +232,44 @@ class AnimeList with ChangeNotifier {
   }
 
   //FUNCTIONS
+
+  Future<List<Anime>> getAnimeListFromUserProfile(UserProfile userProfile) async{
+    List<Anime> userAnimes = [];
+    try {
+      await get(Uri.parse(
+              "$baseUrl$connectUrl/${userProfile.id}.json?auth=${await getToken()}"))
+          .then((value) {
+        dynamic decoded = jsonDecode(
+          value.body,
+        );
+        final loadedData =
+            decoded.runtimeType == Null ? {} : decoded as Map<String, dynamic>;
+        loadedData.forEach((key, value) {
+          Map<String, dynamic> entry =
+              (value as LinkedHashMap<String, dynamic>).cast();
+          userAnimes.add(Anime(
+            id: entry["id"].runtimeType == Null ? "" : entry["id"],
+            genero: entry["genero"].runtimeType == Null
+                ? []
+                : (entry["genero"] as List<dynamic>).cast<String>(),
+            title: entry["title"].runtimeType == Null ? "" : entry["title"],
+            description: entry["description"].runtimeType == Null
+                ? ""
+                : entry["description"],
+            imageUrl:
+                entry["imageUrl"].runtimeType == Null ? "" : entry["imageUrl"],
+            isPrio: entry["isPrio"],
+            watched: entry["watched"],
+            watching: entry["watching"],
+          ));
+        });
+      });
+    } catch (_) {
+      
+    }
+    return userAnimes;
+  }
+
   Future<String> getToken() async {
     if (await CheckConnection.isConnected()) {
       return await FirebaseAuth.instance.currentUser?.getIdToken() ?? "";

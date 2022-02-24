@@ -3,6 +3,7 @@ import 'package:anime_list/components/input_decoration_white.dart';
 import 'package:anime_list/components/not_find_screen.dart';
 import 'package:anime_list/components/row_anime_list_item.dart';
 import 'package:anime_list/models/anime.dart';
+import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
@@ -10,7 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AnimesScreen extends StatefulWidget {
-  const AnimesScreen({Key? key}) : super(key: key);
+  
+  AnimesScreen({Key? key, }) : super(key: key);
 
   @override
   _AnimesScreenState createState() => _AnimesScreenState();
@@ -43,9 +45,15 @@ class _AnimesScreenState extends State<AnimesScreen> {
         : (params as Map<String, Object>).containsKey("query")
             ? ((params as Map<String, Object>)["query"]) as String
             : null;
+    AnimeList? userList = isParamNull
+        ? null
+        : (params as Map<String, Object>).containsKey("userList")
+            ? ((params as Map<String, Object>)["userList"]) as AnimeList
+            : null;
+
     queryData = queryParam ?? "";
     listTipe = listParam ?? ListTipe.ALL;
-    animeList = Provider.of<AnimeList>(context);
+    animeList = userList ?? Provider.of<AnimeList>(context);
     animes = queryData.trim().isEmpty
         ? animeList.getListWithFilters(listTipe: listTipe)
         : animeList
@@ -59,6 +67,7 @@ class _AnimesScreenState extends State<AnimesScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () {
         if (queryFocusNode.hasFocus) {

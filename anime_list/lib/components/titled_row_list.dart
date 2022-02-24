@@ -12,26 +12,34 @@ class TitledRowList extends StatelessWidget {
   final bool hasArrow;
   final ListTipe listTipe;
   final void Function()? onTap;
-  const TitledRowList({ Key? key,
+  AnimeList? userList;
+  TitledRowList(
+      {Key? key,
   required this.title,
   this.hasArrow = false,
   this.listTipe = ListTipe.ALL,
-  this.onTap
+      this.onTap,
+      this.userList
    }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     late final List<Anime> animeList;
     if (listTipe == ListTipe.ALL) {
-      animeList = Provider.of<AnimeList>(context, listen: false).animeList;
+      animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
+          .animeList;
     } else if (listTipe == ListTipe.NORMAL) {
-      animeList = Provider.of<AnimeList>(context, listen: false).normalAnimes;
+      animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
+          .normalAnimes;
     } else if (listTipe == ListTipe.FINISHED) {
-      animeList = Provider.of<AnimeList>(context, listen: false).concluidolAnimes;
+      animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
+          .concluidolAnimes;
     } else if (listTipe == ListTipe.PRIO) {
-      animeList = Provider.of<AnimeList>(context, listen: false).prioAnimes;
+      animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
+          .prioAnimes;
     } else if (listTipe == ListTipe.WATCHING) {
-      animeList = Provider.of<AnimeList>(context, listen: false).watchingAnimes;
+      animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
+          .watchingAnimes;
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +48,11 @@ class TitledRowList extends StatelessWidget {
           padding: const EdgeInsets.only(top: 15, right: 10, left: 10,),
           child: InkWell(
             
-            onTap: onTap,
+            onTap: onTap ??
+                () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.ANIME_LIST,
+                      arguments: {"listTipe": listTipe});
+                },
             child: Row(
               children: [
                 Text(
