@@ -51,94 +51,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           )
         : Scaffold(
-      backgroundColor: Colors.black,
-      drawer: AppDrawer(),
+            backgroundColor: Colors.black,
+            drawer: AppDrawer(),
             body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            // floating: true,
-            // snap: true,
-            expandedHeight: 350,
-            backgroundColor: Colors.black54,
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  // floating: true,
+                  // snap: true,
+                  expandedHeight: 350,
+                  backgroundColor: Colors.black54,
 
-            centerTitle: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                userProfile.name,
-              ),
-              centerTitle: true,
-              collapseMode: CollapseMode.parallax,
-              background: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CircleAvatar(
-                    minRadius: 80,
-                    maxRadius: 100,
-                    foregroundImage: NetworkImage(userProfile.profileImageUrl),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
+                  centerTitle: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(
+                      userProfile.name,
+                    ),
+                    centerTitle: true,
+                    collapseMode: CollapseMode.parallax,
+                    background: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          minRadius: 80,
+                          maxRadius: 100,
+                          foregroundImage:
+                              NetworkImage(userProfile.profileImageUrl),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              onPressed: () {},
                               icon: isSelfUser
                                   ? const Icon(
                                       Icons.favorite,
                                       color: Colors.red,
                                     )
                                   : const Icon(Icons.favorite_border),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                                isSelfUser ? "Editar" : "Adicionar",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(92),
-                              ),
                             ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              child: Text(
+                                isSelfUser ? "Editar" : "Adicionar",
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(92),
+                                    ),
+                                  ),
                                   primary: isSelfUser
                                       ? Theme.of(context).colorScheme.primary
                                       : Theme.of(context).colorScheme.secondary,
-                            onPrimary: Colors.white),
-                      ),
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.email_outlined,
-                          )),
-                    ],
+                                  onPrimary: Colors.white),
+                            ),
+                            IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.email_outlined,
+                                )),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: kToolbarHeight + 3,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(
-                    height: kToolbarHeight + 3,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
                 ),
-                child: Container(
+                SliverToBoxAdapter(
+                  child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      child: Container(
                         color: Colors.grey[850],
-                  child: Column(
+                        child: Column(
                           children: [
-                      TitledRowList(
-                        title: "Assistindo",
-                        hasArrow: true,
-                        listTipe: ListTipe.WATCHING,
+                            TitledRowList(
+                              title: "Assistindo",
+                              hasArrow: true,
+                              listTipe: ListTipe.WATCHING,
                               onTap: () {
                                 Provider.of<AnimeList>(context, listen: false)
                                     .getAnimeListFromUserProfile(userProfile)
@@ -152,11 +154,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       });
                                 });
                               },
-                      ),
-                      TitledRowList(
-                        title: "Prioridades",
-                        hasArrow: true,
-                        listTipe: ListTipe.PRIO,
+                            ),
+                            TitledRowList(
+                              title: "Prioridades",
+                              hasArrow: true,
+                              listTipe: ListTipe.PRIO,
                               onTap: () {
                                 Provider.of<AnimeList>(context, listen: false)
                                     .getAnimeListFromUserProfile(userProfile)
@@ -170,11 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       });
                                 });
                               },
-                      ),
-                      TitledRowList(
-                        title: "Para Assistir",
-                        hasArrow: true,
-                        listTipe: ListTipe.NORMAL,
+                            ),
+                            TitledRowList(
+                              title: "Para Assistir",
+                              hasArrow: true,
+                              listTipe: ListTipe.NORMAL,
                               userList:
                                   AnimeList(context, userList: userListAnime),
                               onTap: () {
@@ -190,11 +192,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       });
                                 });
                               },
-                      ),
-                      TitledRowList(
-                        title: "Concluidos",
-                        hasArrow: true,
-                        listTipe: ListTipe.FINISHED,
+                            ),
+                            TitledRowList(
+                              title: "Concluidos",
+                              hasArrow: true,
+                              listTipe: ListTipe.FINISHED,
                               userList:
                                   AnimeList(context, userList: userListAnime),
                               onTap: () {
@@ -210,16 +212,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       });
                                 });
                               },
-                      ),
+                            ),
                             SizedBox(
                               height: 20,
                             )
-                    ],
-                  ),
-                )),
-          )
-        ],
-      ),
-    );
+                          ],
+                        ),
+                      )),
+                )
+              ],
+            ),
+          );
   }
 }
