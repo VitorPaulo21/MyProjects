@@ -22,6 +22,15 @@ void main() async {
   runApp(const MyApp());
 }
 
+
+//on botonsheet recognize if the anime id is the same from the user id
+//cause not show a botomsheet with add and share only, same for the anime info
+//TODO modify the anime details if the user is other than not the self user
+//TODO change the icon for the continue wath to add icon
+//TODO remove the finalize and delete buttons from the continue watching item
+//implement the edit profile
+//TODO resolver bug do porque a lista do perfil nao mostra com a uid solicitada
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 

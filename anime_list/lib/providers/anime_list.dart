@@ -32,6 +32,7 @@ class AnimeList with ChangeNotifier {
 
   //CRUD
   Future<List<Anime>> getAnimes(BuildContext context) async {
+    
     _animeList.clear();
     isLoaded = false;
     try {
@@ -60,12 +61,14 @@ class AnimeList with ChangeNotifier {
             isPrio: entry["isPrio"],
             watched: entry["watched"],
             watching: entry["watching"],
+              userId: entry["userId"]
           ));
         });
       });
     } catch (_) {
       
     }
+
     getRandomAnimes();
     isLoaded = true;
     notifyListeners();
@@ -113,6 +116,9 @@ class AnimeList with ChangeNotifier {
         if (anime.containsKey("watching")) {
           animeUpdate.watching = anime["watching"] as bool;
         }
+        if (anime.containsKey("userID")) {
+          animeUpdate.userId = anime["userId"] as String;
+        }
         animeList.insert(
             animeList.indexOf(findAnimeById(anime["id"].toString())!),
             animeUpdate);
@@ -131,11 +137,15 @@ class AnimeList with ChangeNotifier {
   void addAnime(Map<String, Object> anime, BuildContext context) async {
     if (await CheckConnection.isConnected()) {
       if (anime.containsKey("id")) {
+        if (anime["id"] != "") {
         updateAnime(anime, context);
         getRandomAnimes();
         return;
+          
+        }
       }
       Anime newAnime = mapToAnime(anime);
+      newAnime.userId = userID;
       _animeList.add(newAnime);
       notifyListeners();
       String token = "?auth=${await getToken()}";
@@ -149,6 +159,7 @@ class AnimeList with ChangeNotifier {
             "watched": newAnime.watched,
             "watching": newAnime.watching,
             "isPrio": newAnime.isPrio,
+            "userId": newAnime.userId
           })).then((response) {
         String id = jsonDecode(response.body)["name"];
 
@@ -236,6 +247,7 @@ class AnimeList with ChangeNotifier {
   Future<List<Anime>> getAnimeListFromUserProfile(UserProfile userProfile) async{
     List<Anime> userAnimes = [];
     try {
+      //TODO voltar o id ao original ISdpsa0JnuhQVjHYNz8juQb3okI2
       await get(Uri.parse(
               "$baseUrl$connectUrl/${userProfile.id}.json?auth=${await getToken()}"))
           .then((value) {
@@ -261,6 +273,7 @@ class AnimeList with ChangeNotifier {
             isPrio: entry["isPrio"],
             watched: entry["watched"],
             watching: entry["watching"],
+              userId: entry["userId"]
           ));
         });
       });
@@ -301,17 +314,21 @@ class AnimeList with ChangeNotifier {
   }
 
   Anime mapToAnime(Map<String, Object> anime) {
+    //TODO verify where this method is in use, then add the user id to map
     Anime newAnime = Anime(
       id: anime.containsKey("id")
           ? anime["id"].toString()
           : Random().nextDouble().toString(),
       title: anime["title"].toString(),
-      genero: anime["genders"] as List<String>,
-      description: anime.containsKey("desc") ? anime["desc"].toString() : "",
-      isPrio: anime.containsKey("prio") ? anime["prio"] as bool : false,
+        genero: anime["genero"] as List<String>,
+        description: anime.containsKey("description")
+            ? anime["description"].toString()
+            : "",
+        isPrio: anime.containsKey("isPrio") ? anime["isPrio"] as bool : false,
+        userId: anime["userId"].toString()
     );
-    if (anime.containsKey("imgUrl")) {
-      newAnime.setImageUrl(anime["imgUrl"].toString());
+    if (anime.containsKey("imageUrl")) {
+      newAnime.setImageUrl(anime["imageUrl"].toString());
     }
     return newAnime;
   }
@@ -327,7 +344,9 @@ class AnimeList with ChangeNotifier {
   //GETTERS AND SETTERS
 
   String get userID {
+   
     return FirebaseAuth.instance.currentUser?.uid ?? "";
+   
   }
 
   List<Anime> get animeList {

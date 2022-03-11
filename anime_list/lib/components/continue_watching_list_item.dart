@@ -3,7 +3,9 @@ import 'package:anime_list/components/info_bottom_sheet.dart';
 import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/utils/methods.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,8 @@ class ContinueWatchingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isSelfUser = Methods.isSelfUser(anime);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
@@ -53,6 +57,10 @@ class ContinueWatchingListItem extends StatelessWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
+                        if (!isSelfUser) {
+                          Methods.addAnimeToListDialog(context, anime);
+                        } else {
+
                         showDialog(
                             context: context,
                             builder: (ctx) {
@@ -65,6 +73,7 @@ class ContinueWatchingListItem extends StatelessWidget {
                                 .pushReplacementNamed(AppRoutes.HOME);
                           }
                         });
+                        }
                       },
                       child: const SizedBox(
                         height: 170,
@@ -154,10 +163,34 @@ class ContinueWatchingListItem extends StatelessWidget {
                                 .pushReplacementNamed(AppRoutes.HOME);
                           }
                         });
+                      } else if (index == 0) {
+                        Methods.addAnimeToListDialog(context, anime);
                       }
                     },
                     icon: const Icon(Icons.more_vert),
                     itemBuilder: (ctx) => [
+                      if (!isSelfUser)
+                        PopupMenuItem(
+                            value: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  "Adicionar",
+                                  style: TextStyle(color: Colors.white),
+                                )
+                              ],
+                            )),
+                      if (isSelfUser)
                       PopupMenuItem(
                           value: 1,
                           child: Row(
@@ -200,6 +233,7 @@ class ContinueWatchingListItem extends StatelessWidget {
                           ],
                         ),
                       ),
+                      if (isSelfUser)
                       PopupMenuItem(
                         value: 3,
                         child: Row(

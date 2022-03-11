@@ -41,7 +41,9 @@ class TitledRowList extends StatelessWidget {
       animeList = (userList ?? Provider.of<AnimeList>(context, listen: false))
           .watchingAnimes;
     }
-    return Column(
+    return animeList.isEmpty
+        ? SizedBox()
+        : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
        Padding(

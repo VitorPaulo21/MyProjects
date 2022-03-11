@@ -7,6 +7,7 @@ class Anime {
   bool watched;
   bool watching;
   bool isPrio;
+  String userId;
   void setImageUrl(String url) {
     imageUrl = url;
   }
@@ -20,7 +21,8 @@ Map<String, Object> getMap() {
       "imageUrl": imageUrl,
       "watched": watched,
       "watching": watching,
-      "isPrio": isPrio
+      "isPrio": isPrio,
+      "userId": userId
     };
   }
 
@@ -31,6 +33,7 @@ Map<String, Object> getMap() {
       this.imageUrl =
           "https://static.wikia.nocookie.net/onepiece/images/6/62/Luffy_Wanted_Poster.png/revision/latest/scale-to-width-down/250?cb=20140829112312&path-prefix=pt",
       required this.genero,
+      required this.userId,
       this.watched = false,
       this.watching = false,
       this.isPrio = false}); 

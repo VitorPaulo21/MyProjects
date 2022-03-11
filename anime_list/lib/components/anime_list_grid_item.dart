@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 
 class AnimeListGridItem extends StatelessWidget {
   final Anime anime;
+  bool? actvateClick;
   final FocusNode? fatherNode;
-  const AnimeListGridItem(this.anime, {Key? key, FocusNode? focusNode})
+  AnimeListGridItem(this.anime,
+      {Key? key, FocusNode? focusNode, this.actvateClick = true})
       : fatherNode = focusNode,
         super(key: key);
 
@@ -31,13 +33,16 @@ class AnimeListGridItem extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
+                onTap: !actvateClick!
+                    ? () {}
+                    : () {
                   if (fatherNode != null) {
                     if (fatherNode!.hasFocus) {
                       fatherNode!.unfocus();
                       return;
                     }
                   }
+                  
                   showModalBottomSheet(
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(

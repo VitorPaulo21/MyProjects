@@ -5,21 +5,21 @@ class data {
     List<Anime> anime = [];
     _DUMMY_ANIMES.forEach((key, value) {
       anime.add(Anime(
-        id: value["delete"]!,
-        title: value["titulo"]!,
-        genero: _stringToList(value["genero"]!),
-        description: value.containsKey("desc") ? value["desc"]! : "",
-        imageUrl: value.containsKey("url")
-            ? value["url"]!
-            : "https://static.wikia.nocookie.net/onepiece/images/6/62/Luffy_Wanted_Poster.png/revision/latest/scale-to-width-down/250?cb=20140829112312&path-prefix=pt",
-        isPrio: value.containsKey("prio") ? value["prio"]! == "1" : false,
-        watched: value.containsKey("Ass")
-            ? value["Ass"]!.toLowerCase() == "true"
-            : false,
-        watching: value.containsKey("watch")
-            ? value["watch"]!.toLowerCase() == "true"
-            : false,
-      ));
+          id: value["delete"]!,
+          title: value["titulo"]!,
+          genero: _stringToList(value["genero"]!),
+          description: value.containsKey("desc") ? value["desc"]! : "",
+          imageUrl: value.containsKey("url")
+              ? value["url"]!
+              : "https://static.wikia.nocookie.net/onepiece/images/6/62/Luffy_Wanted_Poster.png/revision/latest/scale-to-width-down/250?cb=20140829112312&path-prefix=pt",
+          isPrio: value.containsKey("prio") ? value["prio"]! == "1" : false,
+          watched: value.containsKey("Ass")
+              ? value["Ass"]!.toLowerCase() == "true"
+              : false,
+          watching: value.containsKey("watch")
+              ? value["watch"]!.toLowerCase() == "true"
+              : false,
+          userId: "none"));
     });
     return anime;
   }

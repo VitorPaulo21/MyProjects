@@ -6,7 +6,9 @@ import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/copy_to_clipboard.dart';
+import 'package:anime_list/utils/methods.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +20,7 @@ class AnimeDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AnimeList animeList = Provider.of<AnimeList>(context);
     Anime anime = ModalRoute.of(context)?.settings.arguments as Anime;
+    bool isSelfUser = Methods.isSelfUser(anime);
 
     return Scaffold(
         appBar: AppBar(
@@ -59,7 +62,7 @@ class AnimeDetailsScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
-              LabeledChangebleButton(actualAnime: anime),
+              if (isSelfUser) LabeledChangebleButton(actualAnime: anime),
               const SizedBox(
                 width: 10,
               ),
@@ -72,13 +75,14 @@ class AnimeDetailsScreen extends StatelessWidget {
                 function: labeledButtonFunctions.share,
               ),
               Spacer(),
-              LabeledChangebleButton(
-                label: "Remover",
-                actualAnime: anime,
-                color: Colors.red,
-                icon: Icons.delete_outline,
-                function: labeledButtonFunctions.delete,
-              )
+              if (isSelfUser)
+                LabeledChangebleButton(
+                  label: "Remover",
+                  actualAnime: anime,
+                  color: Colors.red,
+                  icon: Icons.delete_outline,
+                  function: labeledButtonFunctions.delete,
+                )
             ],
           ),
         ),
@@ -173,7 +177,10 @@ class AnimeDetailsScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   child: ElevatedButton(
-                      onPressed: () {
+                    onPressed: () {
+                      if (!isSelfUser) {
+                        Methods.addAnimeToListDialog(context, anime);
+                      } else {
                         if (anime.watched) {
                           showDialog(
                             context: context,
@@ -200,53 +207,65 @@ class AnimeDetailsScreen extends StatelessWidget {
                         } else {
                           animeList.changeWacth(anime, context);
                         }
-                      },
-                      style: ElevatedButton.styleFrom(primary: Colors.white),
-                      child: Row(
-                        children: [
-                          const Spacer(),
-                          Icon(
-                            anime.watching ? Icons.check : Icons.play_arrow,
-                            color: Colors.black,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            anime.watching ? "Finalizar" : "Assistir",
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          const Spacer()
-                        ],
-                      )),
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(primary: Colors.white),
+                    child: Row(
+                      children: [
+                        const Spacer(),
+                        Icon(
+                          !isSelfUser
+                              ? Icons.add
+                              : anime.watching
+                                  ? Icons.check
+                                  : Icons.play_arrow,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          !isSelfUser
+                              ? "Adicionar"
+                              : anime.watching
+                                  ? "Finalizar"
+                                  : "Assistir",
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        const Spacer()
+                      ],
+                    ),
+                  ),
                 ),
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(AppRoutes.CREATE_ANIME,
-                            arguments: anime);
-                      },
-                      style:
-                          ElevatedButton.styleFrom(primary: Colors.grey[800]),
-                      child: Row(
-                        children: const [
-                          Spacer(),
-                          Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            "Editar",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Spacer()
-                        ],
-                      )),
-                ),
+                if (isSelfUser)
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                              AppRoutes.CREATE_ANIME,
+                              arguments: anime);
+                        },
+                        style:
+                            ElevatedButton.styleFrom(primary: Colors.grey[800]),
+                        child: Row(
+                          children: const [
+                            Spacer(),
+                            Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              "Editar",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Spacer()
+                          ],
+                        )),
+                  ),
                 const SizedBox(
                   height: 2,
                 ),
@@ -276,12 +295,11 @@ class AnimeDetailsScreen extends StatelessWidget {
   }
 
   Widget netImage(Anime anime) {
-      return CachedNetworkImage(
-        imageUrl: anime.imageUrl,
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      
-      );   
+    return CachedNetworkImage(
+      imageUrl: anime.imageUrl,
+      height: 200,
+      width: double.infinity,
+      fit: BoxFit.cover,
+    );
   }
 }

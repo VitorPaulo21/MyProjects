@@ -32,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     userListAnime = await Provider.of<AnimeList>(context, listen: false)
         .getAnimeListFromUserProfile(userProfile);
+    
     setState(() {
       isLoading = false;
     });
@@ -42,7 +43,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     UserProfile userProfile =
         ModalRoute.of(context)?.settings.arguments as UserProfile;
     bool isSelfUser = userProfile.id ==
-        (Provider.of<UserProfileProvider>(context).userProfile?.id ?? false);
+        (Provider.of<UserProfileProvider>(context, listen: false)
+                .userProfile
+                ?.id ??
+            false);
     getAnimes(userProfile);
     return isLoading
         ? const Center(
@@ -141,6 +145,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               title: "Assistindo",
                               hasArrow: true,
                               listTipe: ListTipe.WATCHING,
+                              userList:
+                                  AnimeList(context, userList: userListAnime),
                               onTap: () {
                                 Provider.of<AnimeList>(context, listen: false)
                                     .getAnimeListFromUserProfile(userProfile)
@@ -159,6 +165,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               title: "Prioridades",
                               hasArrow: true,
                               listTipe: ListTipe.PRIO,
+                              userList:
+                                  AnimeList(context, userList: userListAnime),
                               onTap: () {
                                 Provider.of<AnimeList>(context, listen: false)
                                     .getAnimeListFromUserProfile(userProfile)

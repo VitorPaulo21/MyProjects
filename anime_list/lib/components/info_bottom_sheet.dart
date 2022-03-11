@@ -1,3 +1,5 @@
+
+
 import 'package:anime_list/components/anime_list_grid_item.dart';
 import 'package:anime_list/components/finish_anime_dialog.dart';
 import 'package:anime_list/components/reestart_watching_dialog.dart';
@@ -6,7 +8,10 @@ import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/copy_to_clipboard.dart';
+import 'package:anime_list/utils/methods.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +28,7 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
   Widget build(BuildContext context) {
     AnimeList animeList = Provider.of<AnimeList>(context);
     Anime anime = widget.anime;
+    bool isSelfUser = Methods.isSelfUser(anime);
     return Container(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -32,10 +38,18 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 120,
-                width: 90,
-                child: AnimeListGridItem(anime),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  height: 120,
+                  width: 90,
+                  child: AnimeListGridItem(
+                    anime,
+                    actvateClick: false,
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
@@ -99,8 +113,10 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                 width: MediaQuery.of(context).size.width * 0.5,
                 child: ElevatedButton(
                   onPressed: () {
-                    
-                      if (anime.watched) {
+                    if (!isSelfUser) {
+                      Methods.addAnimeToListDialog(context, anime);
+                      return;
+                    } else if (anime.watched) {
                         
                         showDialog(context: context, builder: (ctx) {
                           return ReestartWatching();
@@ -139,14 +155,22 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                     children: [
                       const Spacer(),
                       Icon(
-                        anime.watching ? Icons.check : Icons.play_arrow,
+                        isSelfUser
+                            ? anime.watching
+                                ? Icons.check
+                                : Icons.play_arrow
+                            : Icons.add,
                         color: Colors.black,
                       ),
                       const SizedBox(
                         width: 3,
                       ),
                       Text(
-                        anime.watching ? "Finalizar" : "Assistir",
+                        isSelfUser
+                            ? anime.watching
+                                ? "Finalizar"
+                                : "Assistir"
+                            : "Adicionar",
                         style: TextStyle(color: Colors.black),
                       ),
                       const Spacer(),
@@ -162,7 +186,8 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       
-                      InkWell(
+                  if (isSelfUser)
+                    InkWell(
                 onTap: () {
                       animeList.changePrio(anime, context);
                 },
@@ -225,4 +250,5 @@ class _InfoBotomSheetState extends State<InfoBotomSheet> {
       ),
     );
   }
+
 }
