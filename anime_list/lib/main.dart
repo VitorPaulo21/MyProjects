@@ -7,6 +7,7 @@ import 'package:anime_list/screens/anime_details_screen.dart';
 import 'package:anime_list/screens/anime_list_screen.dart';
 import 'package:anime_list/screens/auth_screen.dart';
 import 'package:anime_list/screens/crate_anime_screen.dart';
+import 'package:anime_list/screens/friends_screen.dart';
 import 'package:anime_list/screens/no_connection_screen.dart';
 import 'package:anime_list/screens/profile_screen.dart';
 import 'package:anime_list/screens/user_details_screen.dart';
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.NO_CONNECTION: (_) => NoConnectionScreen(),
           AppRoutes.USER_DETAILS_EDIT: (_) => UserDetailsScreen(),
           AppRoutes.PROFILE_SCREEN: (_) => ProfileScreen(),
+          AppRoutes.FRIENDS_SCREEN: (_) => friendsScreen(),
         },
       ),
     );

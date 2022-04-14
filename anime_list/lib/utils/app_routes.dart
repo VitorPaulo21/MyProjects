@@ -8,4 +8,5 @@ class AppRoutes {
   static const String NO_CONNECTION = "/noConnection";
   static const String USER_DETAILS_EDIT = "/userDetailsEdit";
   static const String PROFILE_SCREEN = "/profileScreen";
+  static const String FRIENDS_SCREEN = "/friends";
 }

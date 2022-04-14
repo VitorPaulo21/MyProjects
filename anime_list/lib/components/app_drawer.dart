@@ -109,9 +109,11 @@ class AppDrawer extends StatelessWidget {
                   leading: Icon(Icons.message),
                   title: Text("Mensagens"),
                 ),
-                const ListTile(
-                  leading: Icon(Icons.people),
-                  title: Text("Amigos"),
+                ListTile(
+                  leading: const Icon(Icons.people),
+                  title: const Text("Amigos"),
+                  onTap: () => Navigator.of(context)
+                      .pushReplacementNamed(AppRoutes.FRIENDS_SCREEN),
                 ),
               ],
             ),
