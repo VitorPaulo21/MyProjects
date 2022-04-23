@@ -122,7 +122,7 @@ class UserProfileProvider with ChangeNotifier {
     return exists;
   }
 
-  Future<UserProfile?> get currentUser async {
+  Future<UserProfile?> get currentUser() async {
     late UserProfile? user;
     await get(
             Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"))
@@ -137,6 +137,31 @@ class UserProfileProvider with ChangeNotifier {
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
             id: userId,
+              friends: newUser["friends"] ?? []
+          );
+        }
+      },
+    );
+    return user;
+  }
+  Future<UserProfile?> getUserByUid(String uid) async {
+    late UserProfile? user;
+    await get(
+            Uri.parse("$_baseUrl/$_pasteUrl/$uid.json${await _authToken}"))
+        .then(
+      (value) {
+        if (value.body == "null") {
+          user = null;
+        } else if(value.statusCode < 200 || value.statusCode > 299 ){
+          user = null;
+        } else {
+          Map<String, dynamic> newUser =
+              jsonDecode(value.body) as Map<String, dynamic>;
+          user = UserProfile(
+            name: newUser["name"] ?? "",
+            profileImageUrl: newUser["profileImageUrl"] ?? "",
+            id: userId,
+              friends: newUser["friends"] ?? []
           );
         }
       },
