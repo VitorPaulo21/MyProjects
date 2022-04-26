@@ -2,7 +2,7 @@ class UserProfile {
   String name;
   String profileImageUrl;
   final String? id;
-  List<UserProfile>? friends = [];
+  List<String>? friends = [];
 
   UserProfile(
       {required this.name,

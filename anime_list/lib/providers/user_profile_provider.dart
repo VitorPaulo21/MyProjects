@@ -122,7 +122,7 @@ class UserProfileProvider with ChangeNotifier {
     return exists;
   }
 
-  Future<UserProfile?> get currentUser() async {
+  Future<UserProfile?> get currentUser async {
     late UserProfile? user;
     await get(
             Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"))
