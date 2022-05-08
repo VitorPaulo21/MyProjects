@@ -32,11 +32,37 @@ class _friendsScreenState extends State<friendsScreen> {
         children: [
           Container(
             padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.5),
+                horizontal: MediaQuery.of(context).size.width * 0.11),
             alignment: Alignment.center,
             height: avaliableScreenSpace * 0.15,
             width: double.infinity,
-            child: CupertinoTextField(),
+            
+            child: CupertinoTextField(
+              placeholder: "Persquisar",
+              placeholderStyle: const TextStyle(color: Colors.grey),
+              textInputAction: TextInputAction.search,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+              suffix: Container(
+                margin: EdgeInsets.only(right: 10),
+                child: Icon(
+                  Icons.search,
+                  color: Colors.grey[800],
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(90),
+                ),
+              ),
+            ),
+          ),
+          Divider(
+            color: Colors.grey,
+            height: avaliableScreenSpace * 0.001,
+            endIndent: MediaQuery.of(context).size.width * 0.06,
+            indent: MediaQuery.of(context).size.width * 0.06,
+            thickness: 1,
           )
         ],
       ),
