@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -86,6 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 10,
                             ),
                             TextFormField(
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              textInputAction: TextInputAction.next,
                               decoration: const InputDecoration(
                                 label: Text("Valor:"),
                                 prefixText: "R\$: ",
@@ -95,6 +97,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
+                              validator: (txt) {
+                                if (txt == null) {
+                                  return "O Valor está vazio";
+                                } else if (txt.isEmpty) {
+                                  return "O Valor está vazio";
+                                } else if (double.tryParse(txt) == null) {
+                                  return "Valor numérico inválido";
+                                }
+                              },
                             ),
                             const SizedBox(
                               height: 10,
@@ -160,8 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             DateTime? toAdd = await PickDate(
                                                 initialDate: closeDate);
                                             if (toAdd != null) {
-                                              if (toAdd.isAfter(closeDate!)) {
-                                                dueDate = toAdd;
+                                              if (!toAdd.isBefore(closeDate!)) {
+                                                setState(() {
+                                                  dueDate = toAdd;
+                                                });
                                               } else {
                                                 infoDialog(
                                                     "A data de Vencimento não pode ser menor que a data de Fechamento");
@@ -185,7 +198,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             Container(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  bool isValid =
+                                      formKey.currentState?.validate() ?? false;
+                                  if (isValid) {
+                                    if (closeDate != null) {
+                                      if (dueDate != null) {
+                                      } else {
+                                        infoDialog(
+                                            "A Data de Vencimento nao pode estar vazia");
+                                      }
+                                    } else {
+                                      infoDialog(
+                                          "A Data de Fechamento nao pode estar vazia");
+                                    }
+                                  }
+                                },
                                 child: Text("Adicionar"),
                                 style: ElevatedButton.styleFrom(
                                     shape: const RoundedRectangleBorder(
@@ -211,7 +239,9 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime? dateTime;
     await showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
+            initialDate: DateTime.now().isBefore(initialDate)
+                ? initialDate
+                : DateTime.now(),
             firstDate: initialDate,
             lastDate: endDate)
         .then((value) => dateTime = value);
