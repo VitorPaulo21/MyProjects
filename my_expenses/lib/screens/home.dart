@@ -206,8 +206,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<DateTime?> PickDate({DateTime? initialDate, DateTime? endDate}) async {
-    initialDate ??= DateTime.now().subtract(Duration(days: 365 * 2));
-    endDate ??= DateTime.now().add(Duration(days: 365 * 4));
+    initialDate ??= DateTime.now().subtract(const Duration(days: 365 * 2));
+    endDate ??= DateTime.now().add(const Duration(days: 365 * 4));
     DateTime? dateTime;
     await showDatePicker(
             context: context,
