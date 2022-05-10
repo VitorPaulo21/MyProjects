@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_expenses/models/expense.dart';
+import 'package:my_expenses/models/to_pay.dart';
+import 'package:my_expenses/providers/expensesProvider.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    ExpensesProvider expensesProvider = Provider.of<ExpensesProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -21,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           GlobalKey<FormState> formKey = GlobalKey<FormState>();
-          AddExpense(context, formKey);
+          AddExpense(context, formKey, expensesProvider);
         },
         child: Icon(Icons.add),
       ),
@@ -33,7 +38,19 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: Icon(Icons.edit),
           ),
           Expanded(
-            child: TableCalendar(
+            child: TableCalendar<Expense>(
+                eventLoader: (date) {
+                  return expensesProvider.expenses[date] ?? [];
+                },
+                calendarBuilders: CalendarBuilders<Expense>(
+                  selectedBuilder: (context, day, focusedDay) {
+                    return Container(
+                      color: Colors.red,
+                    );
+                  },
+                ),
+                selectedDayPredicate: (date) => true,
+                startingDayOfWeek: StartingDayOfWeek.monday,
                 calendarFormat: CalendarFormat.month,
                 currentDay: DateTime.now(),
                 focusedDay: DateTime.now(),
@@ -45,10 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<dynamic> AddExpense(
-      BuildContext context, GlobalKey<FormState> formKey) {
+  Future<dynamic> AddExpense(BuildContext context, GlobalKey<FormState> formKey,
+      ExpensesProvider expensesProvider) {
     DateTime? closeDate;
     DateTime? dueDate;
+    TextEditingController valueText = TextEditingController();
     return showModalBottomSheet(
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
@@ -84,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 10,
                             ),
                             TextFormField(
+                              controller: valueText,
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                       decimal: true),
@@ -204,6 +223,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   if (isValid) {
                                     if (closeDate != null) {
                                       if (dueDate != null) {
+                                        expensesProvider.addToPay(
+                                          ToPay(
+                                            expiryDate: closeDate!,
+                                            compensation: dueDate!,
+                                            value: double.parse(valueText.text),
+                                          ),
+                                        );
+                                        Navigator.of(context,
+                                                rootNavigator: true)
+                                            .pop();
                                       } else {
                                         infoDialog(
                                             "A Data de Vencimento nao pode estar vazia");
