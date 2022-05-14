@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ExpensesProvider expensesProvider = Provider.of<ExpensesProvider>(context);
+    print(expensesProvider.expenses.length);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -31,25 +32,37 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Icon(Icons.add),
       ),
       body: Column(
+        
         children: [
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.attach_money),
-            title: Text("R\$0,00"),
+            title: Text(
+                "R\$${expensesProvider.expenses.values.map<List<double>>((e) => e.map((e) => e.value).toList()).fold<double>(0, (previousValue, element) => element.fold<double>(0, (previousValue, element) => element + previousValue) + previousValue)}"),
             trailing: Icon(Icons.edit),
           ),
           Expanded(
             child: TableCalendar<Expense>(
                 eventLoader: (date) {
-                  return expensesProvider.expenses[date] ?? [];
+                  return expensesProvider.expenses[formatDate(date)] ?? [];
                 },
                 calendarBuilders: CalendarBuilders<Expense>(
+                  markerBuilder: (context, day, events) {
+                    if (expensesProvider.expenses
+                        .containsKey(formatDate(day))) {
+                      print(day.toIso8601String());
+                      return Container(
+                        color: Colors.blue,
+                      );
+                    }
+                  },
                   selectedBuilder: (context, day, focusedDay) {
                     return Container(
                       color: Colors.red,
                     );
                   },
                 ),
-                selectedDayPredicate: (date) => true,
+                selectedDayPredicate: (date) =>
+                    compareDates(date, DateTime.now()),
                 startingDayOfWeek: StartingDayOfWeek.monday,
                 calendarFormat: CalendarFormat.month,
                 currentDay: DateTime.now(),
@@ -61,7 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+bool compareDates(DateTime date1, DateTime date2) {
+    return DateFormat("dd/MM/yyyy").format(date1) ==
+        DateFormat("dd/MM/yyyy").format(date2);
+  }
 
+  String formatDate(DateTime date) {
+    return DateFormat("dd/MM/yyyy").format(date);
+  }
   Future<dynamic> AddExpense(BuildContext context, GlobalKey<FormState> formKey,
       ExpensesProvider expensesProvider) {
     DateTime? closeDate;
