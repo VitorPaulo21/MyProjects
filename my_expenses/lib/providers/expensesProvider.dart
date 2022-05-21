@@ -10,7 +10,7 @@ class ExpensesProvider with ChangeNotifier {
 
   void addToPay(ToPay toPay) {
     if (_compareDates(toPay.compensation, toPay.expiryDate)) {
-      expenses[formatDate(toPay.compensation)]?.add(toPay);
+      expenses.putIfAbsent(formatDate(toPay.compensation), () => [toPay]);
     } else {
       expenses[formatDate(toPay.compensation)]?.add(toPay);
       expenses[formatDate(toPay.expiryDate)]?.add(toPay);

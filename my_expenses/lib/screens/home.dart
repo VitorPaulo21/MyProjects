@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ExpensesProvider expensesProvider = Provider.of<ExpensesProvider>(context);
-    print(expensesProvider.expenses.length);
+    print(expensesProvider.expenses.keys.toString() + "expenses");
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -61,8 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
-                selectedDayPredicate: (date) =>
-                    compareDates(date, DateTime.now()),
+                selectedDayPredicate: (date) {
+                  return expensesProvider.expenses
+                      .containsKey(DateFormat("dd/MM/yyyy").format(date));
+                },
                 startingDayOfWeek: StartingDayOfWeek.monday,
                 calendarFormat: CalendarFormat.month,
                 currentDay: DateTime.now(),
