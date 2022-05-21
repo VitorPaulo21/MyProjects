@@ -1,4 +1,4 @@
 class Wallet {
-  int value;
+  double value;
   Wallet(this.value);
 }

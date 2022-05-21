@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/models/expense.dart';
@@ -37,27 +38,40 @@ class _HomeScreenState extends State<HomeScreen> {
           ListTile(
             leading: Icon(Icons.attach_money),
             title: Text(
-                "R\$${expensesProvider.expenses.values.map<List<double>>((e) => e.map((e) => e.value).toList()).fold<double>(0, (previousValue, element) => element.fold<double>(0, (previousValue, element) => element + previousValue) + previousValue)}"),
+                "R\$${expensesProvider.wallet.value.toStringAsFixed(2)}"),
             trailing: Icon(Icons.edit),
           ),
           Expanded(
             child: TableCalendar<Expense>(
-                eventLoader: (date) {
-                  return expensesProvider.expenses[formatDate(date)] ?? [];
-                },
+                // eventLoader: (date) {
+                //   return expensesProvider.expenses[formatDate(date)] ?? [];
+                // },
+
                 calendarBuilders: CalendarBuilders<Expense>(
-                  markerBuilder: (context, day, events) {
-                    if (expensesProvider.expenses
-                        .containsKey(formatDate(day))) {
-                      print(day.toIso8601String());
-                      return Container(
-                        color: Colors.blue,
-                      );
-                    }
-                  },
+
                   selectedBuilder: (context, day, focusedDay) {
-                    return Container(
-                      color: Colors.red,
+                    double dayValue = expensesProvider.allValueByDate(day);
+                    return Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.yellow[200]),
+                          child: Text(DateFormat("dd").format(day)),
+                        ),
+                        Text(
+                          (dayValue > 0 ? "+" : "") +
+                              dayValue.toStringAsFixed(2),
+                          style: TextStyle(
+                              color: dayValue == 0
+                                  ? Colors.amber
+                                  : dayValue > 0
+                                      ? Colors.green
+                                      : Colors.red),
+                        )
+                      ],
                     );
                   },
                 ),
