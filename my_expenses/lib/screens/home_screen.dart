@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_expenses/components/app_drawer.dart';
 import 'package:my_expenses/models/expense.dart';
 import 'package:my_expenses/models/to_pay.dart';
 import 'package:my_expenses/providers/expensesProvider.dart';
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ExpensesProvider expensesProvider = Provider.of<ExpensesProvider>(context);
     print(expensesProvider.expenses.keys.toString() + "expenses");
     return Scaffold(
+      drawer: AppDrawer(),
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text("Meus Gastos"),

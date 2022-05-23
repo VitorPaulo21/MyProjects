@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/providers/cards_provider.dart';
 import 'package:my_expenses/providers/expensesProvider.dart';
-import 'package:my_expenses/screens/home.dart';
+import 'package:my_expenses/screens/cards_screen.dart';
+import 'package:my_expenses/screens/home_screen.dart';
 import 'package:my_expenses/utils/app_routes.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +21,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<ExpensesProvider>(
           create: (ctx) => ExpensesProvider(),
         ),
+        ChangeNotifierProvider<CardsProvider>(
+          create: (ctx) => CardsProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Meus Gastos',
@@ -28,6 +33,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routes: {
           AppRoutes.HOME: (ctx) => HomeScreen(),
+          AppRoutes.CARDS_SCREEN: (ctx) => CardsScreen(),
         },
       ),
     );
