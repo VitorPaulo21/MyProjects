@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/components/app_drawer.dart';
 import 'package:my_expenses/models/expense.dart';
-import 'package:my_expenses/models/to_pay.dart';
+
+import 'package:my_expenses/providers/cards_provider.dart';
 import 'package:my_expenses/providers/expensesProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -19,7 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ExpensesProvider expensesProvider = Provider.of<ExpensesProvider>(context);
-    print(expensesProvider.expenses.keys.toString() + "expenses");
+    CardsProvider cardsProvider = Provider.of<CardsProvider>(context);
+   
     return Scaffold(
       drawer: AppDrawer(),
       resizeToAvoidBottomInset: true,
@@ -44,13 +46,23 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: Icon(Icons.edit),
           ),
           Expanded(
-            child: TableCalendar<Expense>(
-                // eventLoader: (date) {
-                //   return expensesProvider.expenses[formatDate(date)] ?? [];
-                // },
-
+            child: TableCalendar<dynamic>(
+                eventLoader: (date) {
+                  return cardsProvider.cards
+                      .where((element) =>
+                          element.dueDateDay == date.day ||
+                          date
+                                  .add(Duration(days: element.closingDateDay))
+                                  .day ==
+                              element.dueDateDay)
+                      .toList();
+                },
+                
+                onPageChanged: (date) {
+                  print(date.toIso8601String());
+                },
                 calendarBuilders: CalendarBuilders<Expense>(
-
+                  
                   selectedBuilder: (context, day, focusedDay) {
                     double dayValue = expensesProvider.allValueByDate(day);
                     return Stack(
@@ -77,10 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
-                selectedDayPredicate: (date) {
-                  return expensesProvider.expenses
-                      .containsKey(DateFormat("dd/MM/yyyy").format(date));
-                },
+                // selectedDayPredicate: (date) {
+                //   return expensesProvider.expenses
+                //       .containsKey(DateFormat("dd/MM/yyyy").format(date));
+                // },
                 startingDayOfWeek: StartingDayOfWeek.monday,
                 calendarFormat: CalendarFormat.month,
                 currentDay: DateTime.now(),
@@ -261,13 +273,7 @@ bool compareDates(DateTime date1, DateTime date2) {
                                   if (isValid) {
                                     if (closeDate != null) {
                                       if (dueDate != null) {
-                                        expensesProvider.addToPay(
-                                          ToPay(
-                                            expiryDate: closeDate!,
-                                            compensation: dueDate!,
-                                            value: double.parse(valueText.text),
-                                          ),
-                                        );
+                                        // TODO add expense here
                                         Navigator.of(context,
                                                 rootNavigator: true)
                                             .pop();

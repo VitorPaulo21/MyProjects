@@ -1,14 +1,16 @@
+import 'package:my_expenses/models/expense.dart';
+
 class CreditCard {
   String name;
   double _value;
-  List<double> expenses = [];
-  DateTime closingDate;
-  DateTime dueDate;
+  Map<String, List<Expense>> expenses = {};
+  int closingDateDay;
+  int dueDateDay;
 
   CreditCard(
       {required this.name,
-      required this.closingDate,
-      required this.dueDate,
+      required this.closingDateDay,
+      required this.dueDateDay,
       double value = 0})
       : _value = value;
 
@@ -16,10 +18,13 @@ class CreditCard {
     _value = value;
   }
 
-  double get value {
+  double getValueByMonth(String month) {
+    if (expenses.containsKey(month)) {
+      
     _value = _value +
-        expenses.fold<double>(
-            0, (previousValue, actual) => actual + previousValue);
+          expenses[month]!.fold<double>(
+              0, (previousValue, actual) => actual.value + previousValue);
+    }
     return _value;
   }
 }

@@ -1,6 +1,7 @@
 class Expense {
   double value;
-  DateTime compensation;
+  String description;
+  DateTime date;
 
-  Expense({required this.value, required this.compensation});
+  Expense({required this.value, required this.description, required this.date});
 }
