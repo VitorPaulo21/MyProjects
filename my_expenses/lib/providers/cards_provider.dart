@@ -9,6 +9,7 @@ class CardsProvider with ChangeNotifier {
   void addCards(CreditCard card) {
     if (_cards.contains(card)) {
       _cards[_cards.indexOf(card)] = card;
+      notifyListeners();
     } else {
 
     _cards.add(card);
@@ -17,11 +18,19 @@ class CardsProvider with ChangeNotifier {
   }
 
   addExpense(Expense expense, CreditCard card) {
+    String date = DateFormat("MM/yyyy").format(expense.date);
     if (_cards.contains(card)) {
-      _cards[_cards.indexOf(card)]
-          .expenses[DateFormat("MM/yyyy").format(expense.date)]
-          ?.add(expense);
-      notifyListeners();
+      
+      if (_cards[_cards.indexOf(card)].expenses.containsKey(date)) {
+        _cards[_cards.indexOf(card)].expenses[date]!.add(expense);
+      } else {
+        _cards[_cards.indexOf(card)]
+            .expenses
+            .putIfAbsent(date, () => [expense]);
+      }
+    } else {
+      print("nao tem cartao");
+
     }
   }
 

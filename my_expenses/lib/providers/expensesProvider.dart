@@ -5,6 +5,7 @@ import 'package:my_expenses/models/expense.dart';
 
 import 'package:my_expenses/models/wallet.dart';
 import 'package:my_expenses/providers/cards_provider.dart';
+import 'package:my_expenses/providers/month_provider.dart';
 
 import 'salary_provider.dart';
 
@@ -13,7 +14,8 @@ class ExpensesProvider with ChangeNotifier {
   
   CardsProvider? cardsProvider;
   SalaryProvider? salaryProvider;
-  ExpensesProvider(this.cardsProvider, this.salaryProvider);
+  MonthProvider? monthProvider;
+  ExpensesProvider(this.cardsProvider, this.salaryProvider, this.monthProvider);
 set wallet(Wallet newWallet) => _wallet = newWallet;
   Wallet get wallet {
     calculateWallet();
@@ -38,23 +40,35 @@ bool _compareDates(DateTime date1, DateTime date2) {
 double allValueByDate(DateTime date) {
     List<CreditCard> loadMonthCards = cardsProvider!.cards
         .where((card) =>
-            card.expenses.containsKey(DateFormat("MM/yyyy").format(date)))
+            card.expenses.containsKey(
+            DateFormat("MM/yyyy").format(date),
+          ),
+        )
         .toList();
+    double fixCost = (salaryProvider!.getTotalSalaryValueByMonth(
+                DateFormat("MM/yyyy").format(date)) +
+            salaryProvider!.getTotalAdvanceByMonth(DateFormat("MM/yyyy")
+                .format(DateTime(date.year, date.month + 1, date.day)))) -
+        cardsProvider!
+            .cardsTotalValueByMonth(DateFormat("MM/yyyy").format(date));
+
     if (loadMonthCards.isNotEmpty) {
-      return loadMonthCards
+      return fixCost -
+          loadMonthCards
           .map((cards) => cards.expenses[DateFormat("MM/yyyy").format(date)]!
               .fold<double>(
                   0, (previousValue, element) => element.value + previousValue))
           .fold(0, (previousValue, element) => element + previousValue);
     } else {
-      return 0;
+      return fixCost;
     }
   }
-
+ 
   void calculateWallet() {
     //TODO implement the date here when date provider is ready
-    _wallet.value = salaryProvider!.getTotalSalaryValueByMonth("05/2022") -
-        cardsProvider!.cardsTotalValueByMonth("05/2022");
+    _wallet.value =
+        salaryProvider!.getTotalSalaryValueByMonth(monthProvider!.month) -
+            cardsProvider!.cardsTotalValueByMonth(monthProvider!.month);
 
     // _wallet.value = expenses.values
     //     .map<List<double>>((lists) => lists.map((e) => e.value).toList())

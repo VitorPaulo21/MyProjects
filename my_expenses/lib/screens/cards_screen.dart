@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_expenses/models/credit_card.dart';
 import 'package:my_expenses/providers/cards_provider.dart';
+import 'package:my_expenses/providers/month_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../components/outline_text_field.dart';
@@ -14,6 +15,7 @@ class CardsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CardsProvider cardsProvider = Provider.of<CardsProvider>(context);
+    MonthProvider monthProvider = Provider.of<MonthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Meus Cartões"),
@@ -33,6 +35,8 @@ class CardsScreen extends StatelessWidget {
           : ListView.builder(
               itemCount: cardsProvider.cards.length,
               itemBuilder: (ctx, index) {
+                double cardValue = cardsProvider.cards[index]
+                    .getValueByMonth(monthProvider.month);
                 return Container(
                   margin: EdgeInsets.only(top: 8),
                   child: Card(
@@ -41,11 +45,13 @@ class CardsScreen extends StatelessWidget {
                       trailing: FittedBox(
                         //TODO implement the date here when date provider is ready
                         child: Text(
-                          "-R\$" +
-                              cardsProvider.cards[index]
-                                  .getValueByMonth("05/2022")
+                          (cardValue > 0 ? "-" : "") +
+                              "R\$" +
+                              cardValue
                                   .toStringAsFixed(2),
-                          style: TextStyle(color: Colors.red),
+                          style: TextStyle(
+                              color:
+                                  cardValue == 0 ? Colors.green : Colors.red),
                         ),
                       ),
                       leading: const Icon(Icons.credit_card),
@@ -55,6 +61,7 @@ class CardsScreen extends StatelessWidget {
                           context,
                           cardsProvider,
                           cardsProvider.cards[index],
+                          monthProvider
                         );
                       },
                     ),
@@ -64,8 +71,9 @@ class CardsScreen extends StatelessWidget {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          GlobalKey<FormState> formKey = GlobalKey<FormState>();
-          Functions.cardEditBottomSheet(context, cardsProvider, null);
+          
+          Functions.cardEditBottomSheet(
+              context, cardsProvider, null, monthProvider);
         },
         child: const Icon(Icons.add),
       ),

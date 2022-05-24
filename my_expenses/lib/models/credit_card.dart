@@ -21,10 +21,12 @@ class CreditCard {
   double getValueByMonth(String month) {
     if (expenses.containsKey(month)) {
       
-    _value = _value +
+      return _value +
           expenses[month]!.fold<double>(
               0, (previousValue, actual) => actual.value + previousValue);
-    }
+    } else {
+
     return _value;
+    }
   }
 }

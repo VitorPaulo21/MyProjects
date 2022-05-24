@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/providers/month_provider.dart';
 
 import '../components/outline_text_field.dart';
 import '../models/credit_card.dart';
@@ -6,7 +7,10 @@ import '../providers/cards_provider.dart';
 
 class Functions {
   static Future<dynamic> cardEditBottomSheet(
-      BuildContext context, CardsProvider cardsProvider, CreditCard? card) {
+      BuildContext context,
+      CardsProvider cardsProvider,
+      CreditCard? card,
+      MonthProvider monthProvider) {
     TextEditingController cardNameController = TextEditingController();
     TextEditingController initialCardValueController = TextEditingController();
     TextEditingController dueDateController = TextEditingController();
@@ -15,9 +19,10 @@ class Functions {
     if (card != null) {
       cardNameController.text = card.name;
       //TODO when date provider is ready implement the call here
-      initialCardValueController.text = card.getValueByMonth("05/2022") == 0
+      initialCardValueController.text =
+          card.getValueByMonth(monthProvider.month) == 0
           ? ""
-          : card.getValueByMonth("05/2022").toStringAsFixed(2);
+              : card.getValueByMonth(monthProvider.month).toStringAsFixed(2);
       dueDateController.text = card.dueDateDay.toString();
       closingDateController.text = card.closingDateDay.toString();
     }
@@ -49,31 +54,28 @@ class Functions {
     }
 
     return showModalBottomSheet(
+
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
           topRight: Radius.circular(20),
           topLeft: Radius.circular(20),
         )),
         context: context,
-        isScrollControlled: true,
+        
         builder: (ctx) {
           return GestureDetector(
-            onDoubleTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            child: DraggableScrollableSheet(
-              initialChildSize: 0.7,
-              minChildSize: 0.7,
-              maxChildSize: 0.7,
-              expand: false,
-              builder: (context, scrollController) {
-                return SingleChildScrollView(
+              onDoubleTap: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              child: SizedBox(
+                width: MediaQuery.of(context).size.height * 0.6,
+                child: SingleChildScrollView(
                   child: Form(
                     key: formKey,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const SizedBox(
@@ -175,9 +177,10 @@ class Functions {
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              )
+              
+            
           );
         });
   }
