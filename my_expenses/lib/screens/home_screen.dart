@@ -110,11 +110,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 selectedDayPredicate: (date) {
                   String formatedDate = DateFormat("MM/yyyy").format(date);
+                  DateTime advanceDate =
+                      DateTime(date.year, date.month + 1, date.day);
+                  String advanceDateFormated =
+                      DateFormat("MM/yyyy").format(advanceDate);
+                  
                   bool isSomeEvent = false;
+
                   if (salaryProvider.salaryies.containsKey(formatedDate)) {
                     isSomeEvent = salaryProvider.salaryies[formatedDate]!
                         .any((salary) => salary.receiptDate == date.day);
                   }
+                  if (salaryProvider.salaryies
+                          .containsKey(advanceDateFormated) &&
+                      !isSomeEvent) {
+                    isSomeEvent = salaryProvider.salaryies[advanceDateFormated]!
+                        .any((salary) => salary.advanceDate == advanceDate.day);
+                  }
+
                   return isSomeEvent;
                 },
                 startingDayOfWeek: StartingDayOfWeek.monday,
