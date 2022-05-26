@@ -46,6 +46,10 @@ class ExpensesProvider with ChangeNotifier {
     String formateDate = DateFormat("MM/yyyy").format(date);
     String advanceDate = DateFormat("MM/yyyy")
         .format(DateTime(date.year, date.month + 1, date.day));
+    double monthSalaryValue =
+        salaryProvider!.getTotalSalaryValueByMonth(formateDate);
+    double monthCardValue = cardsProvider!.cardsTotalValueByMonth(formateDate);
+    double dayCardsValue = 0;
     
     //Se eu tenho um salario esse mes
     if (salaryProvider!.salaryies.containsKey(formateDate)) {
@@ -66,7 +70,12 @@ class ExpensesProvider with ChangeNotifier {
                 );
           } else {
             //caso contrario cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas
-            return 0;
+            if (date.day ==
+                salaryProvider!.salaryies[advanceDate]!.first.advanceDate) {
+              return 0;
+            } else {
+              return 0;
+            }
           }
         } else {
           //caso contrario cria um valor no dia vinte referente ao que sobrou do salario desse mes menos as despesas
