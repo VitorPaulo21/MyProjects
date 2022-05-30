@@ -38,7 +38,6 @@ class _friendsScreenState extends State<friendsScreen> {
         children: [
           Container(
             padding: EdgeInsets.symmetric(
-<<<<<<< HEAD
                 horizontal: MediaQuery.of(context).size.width * 0.11),
             alignment: Alignment.center,
             height: avaliableScreenSpace * 0.15,
@@ -56,22 +55,8 @@ class _friendsScreenState extends State<friendsScreen> {
                   color: Colors.grey[800],
                 ),
               ),
-=======
-              horizontal: MediaQuery.of(context).size.width * 0.1,
-            ),
-            alignment: Alignment.center,
-            height: avaliableScreenSpace * 0.15,
-            width: double.infinity,
-            child: CupertinoTextField(
-              prefix: Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  child: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  )),
-              placeholder: "Pesquisar",
-              placeholderStyle: const TextStyle(color: Colors.grey),
->>>>>>> 01ce67f76d844ee73f226d9f8ab6d40f2c8c070d
+
+
               decoration: BoxDecoration(
                 color: Colors.grey[300],
                 borderRadius: const BorderRadius.all(
@@ -81,20 +66,17 @@ class _friendsScreenState extends State<friendsScreen> {
             ),
           ),
           Divider(
-<<<<<<< HEAD
+
             color: Colors.grey,
             height: avaliableScreenSpace * 0.001,
             endIndent: MediaQuery.of(context).size.width * 0.06,
             indent: MediaQuery.of(context).size.width * 0.06,
             thickness: 1,
-=======
-            indent: MediaQuery.of(context).size.width * 0.05,
-            endIndent: MediaQuery.of(context).size.width * 0.05,
-            thickness: 2,
-            height: avaliableScreenSpace * 0.01,
+
           ),
           Container(
-            height: avaliableScreenSpace * 0.84,
+            height: avaliableScreenSpace * 0.84 -
+                MediaQuery.of(context).viewInsets.bottom,
             child: ListView.builder(
                 itemCount:
                     userProfileProvider.userProfile?.friends?.length ?? 0,
@@ -103,7 +85,6 @@ class _friendsScreenState extends State<friendsScreen> {
 
                   return listile;
                 }),
->>>>>>> 01ce67f76d844ee73f226d9f8ab6d40f2c8c070d
           )
         ],
       ),
