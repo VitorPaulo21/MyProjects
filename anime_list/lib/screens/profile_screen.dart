@@ -47,10 +47,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     UserProfile userProfile =
         ModalRoute.of(context)?.settings.arguments as UserProfile;
+    print(userProfile.id);
     bool isSelfUser = userProfile.id ==
+        (
         (Provider.of<UserProfileProvider>(context, listen: false)
                 .userProfile
-                ?.id ??
+                ?.id) ??
             false);
     getAnimes(userProfile);
     return WillPopScope(

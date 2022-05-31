@@ -1,4 +1,7 @@
+import 'package:anime_list/components/app_drawer.dart';
+import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/providers/user_profile_provider.dart';
+import 'package:anime_list/utils/app_routes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,33 @@ class friendsScreen extends StatefulWidget {
 }
 
 class _friendsScreenState extends State<friendsScreen> {
+  List<UserProfile> friends = [];
+  bool isLoading = true;
+  @override
+  void didChangeDependencies() async {
+    friends.clear();
+    UserProfile? user =
+        await Provider.of<UserProfileProvider>(context, listen: false)
+            .currentUser;
+    if (user != null) {
+      if ((user.friends?.length ?? 0) > 0) {
+        for (var i = 0; i < (user.friends?.length ?? 0); i++) {
+          UserProfile? innerUser =
+              await Provider.of<UserProfileProvider>(context, listen: false)
+                  .getUserByUid(user.friends![i]);
+          if (innerUser != null) {
+            friends.add(innerUser);
+          } else {
+            continue;
+          }
+        }
+      }
+    }
+    super.didChangeDependencies();
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     double avaliableScreenSpace = MediaQuery.of(context).size.height -
@@ -32,6 +62,7 @@ class _friendsScreenState extends State<friendsScreen> {
           ),
         ],
       ),
+      drawer: AppDrawer(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -74,17 +105,55 @@ class _friendsScreenState extends State<friendsScreen> {
             thickness: 1,
 
           ),
+          if (isLoading)
+            const Expanded(
+                child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )),
+          if (!isLoading && friends.length > 0)
+
           Container(
             height: avaliableScreenSpace * 0.84 -
                 MediaQuery.of(context).viewInsets.bottom,
-            child: ListView.builder(
-                itemCount:
-                    userProfileProvider.userProfile?.friends?.length ?? 0,
-                itemBuilder: (ctx, index) {
-                  ListTile? listile = ListTile();
+              child: RefreshIndicator(
+                color: Colors.white,
+                onRefresh: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  didChangeDependencies();
+                },
+                child: ListView.builder(
+                    itemCount: friends.length,
+                    itemBuilder: (ctx, index) {
+                   
+                      ListTile? listile = ListTile(
+                        onTap: (){
+                          Navigator.of(context).pushReplacementNamed(AppRoutes.PROFILE_SCREEN, arguments: friends[index])
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              const AssetImage("lib/assets/luffy_like.png"),
+                          foregroundImage: CachedNetworkImageProvider(
+                              friends[index].profileImageUrl),
+                        ),
+                        title: Text(friends[index].name),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(onPressed: (){}, icon: const Icon(Icons.email_outlined)),
+                            IconButton(onPressed: (){}, icon: const Icon(Icons.group_remove_outlined,color: Colors.red,)),
 
-                  return listile;
-                }),
+                          ],
+                        ),
+                      );
+
+                      return listile;
+                    }),
+              ),
           )
         ],
       ),

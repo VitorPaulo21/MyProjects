@@ -57,6 +57,7 @@ class UserProfileProvider with ChangeNotifier {
             "name": user.name,
             "profileImageUrl": user.profileImageUrl,
             "id": userId,
+            "friends": user.friends
           },
         ),
       );
@@ -85,6 +86,7 @@ class UserProfileProvider with ChangeNotifier {
           "name": user.name,
           "profileImageUrl": user.profileImageUrl,
           "id": userId,
+          "friends": user.friends
         },
       ),
     );
@@ -137,7 +139,7 @@ class UserProfileProvider with ChangeNotifier {
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
             id: userId,
-              friends: newUser["friends"] ?? []
+              friends: (newUser["friends"] as List<dynamic>).cast<String>()
           );
         }
       },
@@ -160,12 +162,14 @@ class UserProfileProvider with ChangeNotifier {
           user = UserProfile(
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
-            id: userId,
-              friends: newUser["friends"] ?? []
+              id: newUser["id"] as String,
+              friends: ((newUser["friends"] ?? <dynamic>[]) as List<dynamic>)
+                  .cast<String>()
           );
         }
       },
     );
     return user;
   }
+
 }
