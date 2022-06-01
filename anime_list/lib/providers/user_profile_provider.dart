@@ -57,7 +57,8 @@ class UserProfileProvider with ChangeNotifier {
             "name": user.name,
             "profileImageUrl": user.profileImageUrl,
             "id": userId,
-            "friends": user.friends
+            "friends": user.friends,
+            "invites": user.invites,
           },
         ),
       );
@@ -86,7 +87,8 @@ class UserProfileProvider with ChangeNotifier {
           "name": user.name,
           "profileImageUrl": user.profileImageUrl,
           "id": userId,
-          "friends": user.friends
+          "friends": user.friends,
+          "invites": user.invites,
         },
       ),
     );
@@ -139,7 +141,10 @@ class UserProfileProvider with ChangeNotifier {
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
             id: userId,
-              friends: (newUser["friends"] as List<dynamic>).cast<String>()
+            friends:
+                ((newUser["friends"] ?? []) as List<dynamic>).cast<String>(),
+            invites:
+                ((newUser["invites"] ?? []) as List<dynamic>).cast<String>(),
           );
         }
       },
@@ -164,7 +169,9 @@ class UserProfileProvider with ChangeNotifier {
             profileImageUrl: newUser["profileImageUrl"] ?? "",
               id: newUser["id"] as String,
               friends: ((newUser["friends"] ?? <dynamic>[]) as List<dynamic>)
-                  .cast<String>()
+                .cast<String>(),
+            invites: ((newUser["invites"] ?? <dynamic>[]) as List<dynamic>)
+                .cast<String>(),
           );
         }
       },
