@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 class UserProfileProvider with ChangeNotifier {
   String _baseUrl = "https://stormapp-80b5f.firebaseio.com";
+  String pagetQueryUrl = "https://firebasedatabase.googleapis.com/v1beta/";
   String _pasteUrl = "User-Profiles";
   UserProfile? userProfile;
 
@@ -128,8 +129,7 @@ class UserProfileProvider with ChangeNotifier {
 
   Future<UserProfile?> get currentUser async {
     late UserProfile? user;
-    await get(
-            Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"))
+    await get(Uri.parse("$_baseUrl/$_pasteUrl/$userId.json${await _authToken}"))
         .then(
       (value) {
         if (value.body == "null") {
@@ -151,15 +151,15 @@ class UserProfileProvider with ChangeNotifier {
     );
     return user;
   }
+
   Future<UserProfile?> getUserByUid(String uid) async {
     late UserProfile? user;
-    await get(
-            Uri.parse("$_baseUrl/$_pasteUrl/$uid.json${await _authToken}"))
+    await get(Uri.parse("$_baseUrl/$_pasteUrl/$uid.json${await _authToken}"))
         .then(
       (value) {
         if (value.body == "null") {
           user = null;
-        } else if(value.statusCode < 200 || value.statusCode > 299 ){
+        } else if (value.statusCode < 200 || value.statusCode > 299) {
           user = null;
         } else {
           Map<String, dynamic> newUser =
@@ -167,8 +167,8 @@ class UserProfileProvider with ChangeNotifier {
           user = UserProfile(
             name: newUser["name"] ?? "",
             profileImageUrl: newUser["profileImageUrl"] ?? "",
-              id: newUser["id"] as String,
-              friends: ((newUser["friends"] ?? <dynamic>[]) as List<dynamic>)
+            id: newUser["id"] as String,
+            friends: ((newUser["friends"] ?? <dynamic>[]) as List<dynamic>)
                 .cast<String>(),
             invites: ((newUser["invites"] ?? <dynamic>[]) as List<dynamic>)
                 .cast<String>(),
@@ -179,4 +179,46 @@ class UserProfileProvider with ChangeNotifier {
     return user;
   }
 
+  Future<List<UserProfile>> searchForRelatedUsers(String query) async {
+    List<UserProfile> usersQueryList = [];
+    Map<String, dynamic> usersList = {};
+    await get(Uri.parse(
+      "$_baseUrl/$_pasteUrl/UserNames.json/${await _authToken}&orderBy=\"\$key\"&equalTo=\"$query\"",
+    )).then(
+      (value) {
+        if (value.body == "null") {
+          print("nulo");
+          return;
+        } else if (value.statusCode < 200 || value.statusCode > 299) {
+          print("Erro " + value.statusCode.toString());
+          return;
+        } else {
+          print(value.body);
+          usersList = jsonDecode(value.body) as Map<String, dynamic>;
+        }
+      },
+    );
+    for (String uidQuery in usersList.values.cast<String>()) {
+      if (uidQuery == userId) {
+        continue;
+      }
+      UserProfile? queryUser = await getUserByUid(uidQuery);
+      if (queryUser != null) {
+        usersQueryList.add(queryUser);
+      }
+    }
+    return usersQueryList;
+  }
+
+  void addAFriend(UserProfile friend) async {
+    userProfile?.friends?.add(friend.id!);
+    await updateUser(userProfile);
+    notifyListeners();
+  }
+
+  void removeFriend(UserProfile friend) async {
+    userProfile?.friends?.removeWhere((element) => element == friend.id);
+    await updateUser(userProfile);
+    notifyListeners();
+  }
 }
