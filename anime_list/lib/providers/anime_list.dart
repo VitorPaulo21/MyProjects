@@ -246,14 +246,25 @@ class AnimeList with ChangeNotifier {
 
   Future<List<Anime>> getAnimeListFromUserProfile(UserProfile userProfile) async{
     List<Anime> userAnimes = [];
+    String connectionUrl =
+        "$baseUrl$connectUrl/${userProfile.id}.json?auth=${await getToken()}";
+    
     try {
       //TODO voltar o id ao original ISdpsa0JnuhQVjHYNz8juQb3okI2
-      await get(Uri.parse(
-              "$baseUrl$connectUrl/${userProfile.id}.json?auth=${await getToken()}"))
+      await get(Uri.parse(connectionUrl))
           .then((value) {
-        dynamic decoded = jsonDecode(
+        print(value.statusCode);
+        if (value.body == "null" ||
+            (value.statusCode < 200 || value.statusCode > 299)) {
+          return;
+        } else {
+          dynamic decoded = jsonDecode(
           value.body,
         );
+        
+          if ((decoded as Map<String, dynamic>).isEmpty) {
+            return;
+          }
         final loadedData =
             decoded.runtimeType == Null ? {} : decoded as Map<String, dynamic>;
         loadedData.forEach((key, value) {
@@ -275,7 +286,8 @@ class AnimeList with ChangeNotifier {
             watching: entry["watching"],
               userId: entry["userId"]
           ));
-        });
+          });
+        }
       });
     } catch (_) {
       

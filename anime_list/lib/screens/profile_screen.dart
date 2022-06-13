@@ -7,8 +7,10 @@ import 'package:anime_list/models/anime.dart';
 import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/providers/anime_list.dart';
 import 'package:anime_list/providers/user_profile_provider.dart';
+import 'package:anime_list/screens/friends_screen.dart';
 import 'package:anime_list/utils/app_routes.dart';
 import 'package:anime_list/utils/list_tipe.dart';
+import 'package:anime_list/utils/methods.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,41 +24,57 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<Anime> userListAnime = [];
   bool isLoading = true;
-
-  getAnimes(UserProfile userProfile) async {
-    if (userListAnime.isNotEmpty) {
-      print("here");
-      return;
-    }
+  bool chargedOnce = false;
+  bool areAlreadyFriends = false;
+  late UserProfile userProfile;
+  void getAnimes(UserProfile userProfile) async {
+   
     setState(() {
       isLoading = true;
     });
+   
     userListAnime = await Provider.of<AnimeList>(context, listen: false)
         .getAnimeListFromUserProfile(userProfile);
-
+    
     setState(() {
       isLoading = false;
+      chargedOnce = true;
     });
   }
-@override
+  @override
+  void didChangeDependencies() {
+    userProfile = ModalRoute.of(context)?.settings.arguments as UserProfile;
+    if (!chargedOnce) {
+      getAnimes(userProfile);
+    }
+
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     userListAnime = [];
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    UserProfile userProfile =
-        ModalRoute.of(context)?.settings.arguments as UserProfile;
-    print(userProfile.id);
+    areAlreadyFriends = Provider.of<UserProfileProvider>(context, listen: false)
+            .userProfile
+            ?.friends
+            ?.contains(userProfile.id) ??
+        false;
+        
+    
     bool isSelfUser = userProfile.id ==
         (
         (Provider.of<UserProfileProvider>(context, listen: false)
                 .userProfile
                 ?.id) ??
             false);
-    getAnimes(userProfile);
+    
     return WillPopScope(
       onWillPop: () {
+        FocusManager.instance.primaryFocus?.unfocus();
         return Future.value(false);
       },
       child: isLoading
@@ -109,9 +127,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     : const Icon(Icons.favorite_border),
                               ),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (areAlreadyFriends) {
+                                    Methods.removeFriendDialog(
+                                            userProfile, context)
+                                        .then((value) {
+                                      if (value ?? false) {
+                                        Provider.of<UserProfileProvider>(
+                                                context,
+                                                listen: false)
+                                            .removeFriend(userProfile);
+
+                                        setState(() {});
+                                      }
+                                    });
+                                  } else {
+                                    Methods.addFriendDialog(
+                                            userProfile, context)
+                                        .then((value) {
+                                      if (value ?? false) {
+                                        Provider.of<UserProfileProvider>(
+                                                context,
+                                                listen: false)
+                                            .addAFriend(userProfile);
+
+                                        getAnimes(userProfile);
+                                      }
+                                    });
+                                  }
+                                },
                                 child: Text(
-                                  isSelfUser ? "Editar" : "Adicionar",
+                                  isSelfUser
+                                      ? "Editar"
+                                      : areAlreadyFriends
+                                          ? "Seguindo"
+                                          : "Adicionar",
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -153,8 +203,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Container(
                           color: Colors.grey[850],
-                          child: Column(
+                          child: !areAlreadyFriends
+                              ? null
+                              : Column(
                             children: [
+                                    if (userListAnime.isEmpty)
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                    if (userListAnime.isEmpty)
+                                      Text(
+                                        "${userProfile.name} ainda não possui nenhum anime na lista.",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                               TitledRowList(
                                 title: "Assistindo",
                                 hasArrow: true,

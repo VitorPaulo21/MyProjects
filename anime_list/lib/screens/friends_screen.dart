@@ -1,9 +1,8 @@
-
-
 import 'package:anime_list/components/app_drawer.dart';
 import 'package:anime_list/models/user_profile.dart';
 import 'package:anime_list/providers/user_profile_provider.dart';
 import 'package:anime_list/utils/app_routes.dart';
+import 'package:anime_list/utils/methods.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +16,10 @@ class friendsScreen extends StatefulWidget {
 }
 
 class _friendsScreenState extends State<friendsScreen> {
+  List<UserProfile> loadedFriends = [];
   List<UserProfile> friends = [];
   bool isLoading = true;
+  TextEditingController queryController = TextEditingController();
   @override
   void initState() {
     loadFriends();
@@ -43,6 +44,7 @@ class _friendsScreenState extends State<friendsScreen> {
         }
       }
     }
+    loadedFriends = [...friends];
     setState(() {
       isLoading = false;
     });
@@ -71,54 +73,168 @@ class _friendsScreenState extends State<friendsScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.11),
-            alignment: Alignment.center,
-            height: avaliableScreenSpace * 0.15,
-            width: double.infinity,
-            child: CupertinoTextField(
-              placeholder: "Persquisar",
-              placeholderStyle: const TextStyle(color: Colors.grey),
-              textInputAction: TextInputAction.search,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-              suffix: Container(
-                margin: EdgeInsets.only(right: 10),
-                child: Icon(
-                  Icons.search,
-                  color: Colors.grey[800],
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(90),
-                ),
-              ),
+      body: WillPopScope(
+        onWillPop: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          return Future<bool>.value(false);
+        },
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                )
+              : loadedFriends.isEmpty
+                  ? SingleChildScrollView(
+                      child: Container(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "lib/assets/no_friends_find.png",
+                              height: 300,
+                            ),
+                            const Text(
+                              "Ops...\nVocê não adicionou amigos ainda!",
+                              style: TextStyle(
+                                // fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            ElevatedButton(
+                              onPressed: () => SearchFriendDialog(
+                                  context, userProfileProvider),
+                              child: const Text(
+                                "Adicionar",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                primary:
+                                    Theme.of(context).colorScheme.secondary,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.11),
+                          alignment: Alignment.center,
+                          height: avaliableScreenSpace * 0.15,
+                          width: double.infinity,
+                          child: searchTextField(),
+                        ),
+                        Divider(
+                          color: Colors.grey,
+                          height: avaliableScreenSpace * 0.001,
+                          endIndent: MediaQuery.of(context).size.width * 0.06,
+                          indent: MediaQuery.of(context).size.width * 0.06,
+                          thickness: 1,
+                        ),
+                        if (isLoading)
+                          const Expanded(
+                              child: Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )),
+                        if (friends.isEmpty)
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        if (friends.isEmpty)
+                          const Text(
+                            "Nenhum nome correspondente...",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        if (!isLoading && friends.isNotEmpty)
+                          FriendsList(avaliableScreenSpace, context)
+                      ],
+                    ),
+        ),
+      ),
+    );
+  }
+
+  CupertinoTextField searchTextField() {
+    return CupertinoTextField(
+      controller: queryController,
+      placeholder: "Persquisar",
+      placeholderStyle: const TextStyle(color: Colors.grey),
+      textInputAction: TextInputAction.search,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
+      suffix: InkWell(
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(90),
+          bottomRight: Radius.circular(90),
+        ),
+        onTap: queryController.text.isEmpty
+            ? null
+            : () {
+                setState(() {
+                  friends = friends
+                      .where((friend) => friend.name
+                          .toLowerCase()
+                          .contains(queryController.text.toLowerCase()))
+                      .toList();
+                });
+              },
+        child: Container(
+          alignment: Alignment.center,
+          width: 45,
+          height: 30,
+          decoration: BoxDecoration(
+            color: queryController.text.isEmpty ? null : Colors.cyan,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(90),
+              bottomRight: Radius.circular(90),
             ),
           ),
-          Divider(
-            color: Colors.grey,
-            height: avaliableScreenSpace * 0.001,
-            endIndent: MediaQuery.of(context).size.width * 0.06,
-            indent: MediaQuery.of(context).size.width * 0.06,
-            thickness: 1,
+          child: Icon(
+            Icons.search,
+            color:
+                queryController.text.isEmpty ? Colors.grey[800] : Colors.white,
           ),
-          if (isLoading)
-            const Expanded(
-                child: Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            )),
-          if (!isLoading && friends.length > 0)
-            FriendsList(avaliableScreenSpace, context)
-        ],
+        ),
       ),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: const BorderRadius.all(
+          Radius.circular(90),
+        ),
+      ),
+      onChanged: (txt) {
+        if (txt.isEmpty) {
+          setState(() {
+            friends = [...loadedFriends];
+          });
+        } else if (txt.length == 1) {
+          setState(() {});
+        }
+      },
+      onSubmitted: (txt) {
+        setState(() {
+          friends = friends
+              .where((friend) => friend.name
+                  .toLowerCase()
+                  .contains(queryController.text.toLowerCase()))
+              .toList();
+        });
+      },
     );
   }
 
@@ -159,7 +275,8 @@ class _friendsScreenState extends State<friendsScreen> {
                         icon: const Icon(Icons.email_outlined)),
                     IconButton(
                         onPressed: () {
-                          removeFriendDialog(context, index).then((value) {
+                          Methods.removeFriendDialog(friends[index], context)
+                              .then((value) {
                             if (value ?? false) {
                               Provider.of<UserProfileProvider>(context,
                                       listen: false)
@@ -186,36 +303,7 @@ class _friendsScreenState extends State<friendsScreen> {
     );
   }
 
-  Future<bool?> removeFriendDialog(BuildContext context, int index) {
-    return showDialog<bool>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: Text("Remover ${friends[index].name} como Amigo?"),
-            content: const Text("Voces não verao mais informaões um do outro"),
-            actions: [
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context, rootNavigator: true).pop(true),
-                child: Text(
-                  "Sim",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.secondary),
-                ),
-              ),
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context, rootNavigator: true).pop(false),
-                child: Text(
-                  "Não",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.secondary),
-                ),
-              ),
-            ],
-          );
-        });
-  }
+ 
 
   SearchFriendDialog(
       BuildContext context, UserProfileProvider userProfileProvider) async {
@@ -353,42 +441,9 @@ class _friendsScreenState extends State<friendsScreen> {
                         trailing: IconButton(
                           padding: EdgeInsets.all(0),
                           onPressed: () {
-                            showDialog<bool>(
-                                context: context,
-                                builder: (ctx) {
-                                  return AlertDialog(
-                                    title: Text(
-                                        "Adicionar ${profile.name} como Amigo?"),
-                                    content: const Text(
-                                        "Voces poderao ver a Lista de Animes um do outro e enviar mensagens"),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop(true),
-                                        child: Text(
-                                          "Sim",
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop(false),
-                                        child: Text(
-                                          "Não",
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }).then((value) {
+                            
+                            Methods.addFriendDialog(profile, context)
+                                .then((value) {
                               if (value ?? false) {
                                 userProfileProvider.addAFriend(profile);
                                 Navigator.of(context, rootNavigator: true)
@@ -433,4 +488,6 @@ class _friendsScreenState extends State<friendsScreen> {
           });
         });
   }
+
+  
 }

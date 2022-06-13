@@ -8,10 +8,12 @@ class CheckConnection {
     return await _internetConnection();
   }
 
-  static Future<bool> _internetConnection() async {
+  static Future<bool> _internetConnection(
+      {String url = "google.com.br"}) async {
     late final List<InternetAddress> response;
     try {
-      response = await InternetAddress.lookup("google.com.br",
+      response =
+          await InternetAddress.lookup(url,
           type: InternetAddressType.IPv4);
     } on SocketException catch (e) {
       return false;
@@ -19,4 +21,5 @@ class CheckConnection {
 
     return response.isNotEmpty;
   }
+ 
 }

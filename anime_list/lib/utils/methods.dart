@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/anime.dart';
+import '../models/user_profile.dart';
 import '../providers/anime_list.dart';
 
 class Methods {
@@ -73,5 +74,68 @@ class Methods {
   static bool isSelfUser(Anime anime) {
     String acessingUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
     return anime.userId == acessingUserId;
+  }
+
+  static Future<bool?> addFriendDialog(
+      UserProfile profile, BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Adicionar ${profile.name} como Amigo?"),
+            content: const Text(
+                "Voces poderao ver a Lista de Animes um do outro e enviar mensagens"),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(ctx, rootNavigator: true).pop(true),
+                child: Text(
+                  "Sim",
+                  style: TextStyle(color: Theme.of(ctx).colorScheme.secondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(ctx, rootNavigator: true).pop(false),
+                child: Text(
+                  "Não",
+                  style: TextStyle(color: Theme.of(ctx).colorScheme.secondary),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
+  static Future<bool?> removeFriendDialog(
+      UserProfile user, BuildContext context) {
+    return showDialog<bool>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Remover ${user.name} como Amigo?"),
+            content: const Text("Voces não verao mais informaões um do outro"),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(true),
+                child: Text(
+                  "Sim",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(false),
+                child: Text(
+                  "Não",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
